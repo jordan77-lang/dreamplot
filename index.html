@@ -3,13 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>DreamCurve</title>
+<title>DreamPlot — ASU</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;800&display=swap');
-:root{--bg:#f7f6f2;--surface:#ffffff;--border:#e2dfd8;--border2:#ccc9c0;--accent:#1a6fcf;--accent2:#d93535;--accent3:#b45309;--text:#1c1c2e;--muted:#888899;}
+:root{--bg:#faf9f6;--surface:#ffffff;--border:#e8e4df;--border2:#ccc9c0;--accent:#8C1D40;--accent2:#c0392b;--accent3:#7a6000;--text:#1c1c2e;--muted:#888899;--gold:#FFC627;--maroon:#8C1D40;}
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:'Syne',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:grid;grid-template-rows:auto 1fr;overflow:hidden;}
-header{padding:1.2rem 2rem;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);background:var(--surface);box-shadow:0 1px 3px rgba(0,0,0,.06);}
+header{padding:1rem 2rem;display:flex;align-items:center;justify-content:space-between;border-bottom:3px solid var(--gold);background:var(--surface);box-shadow:0 1px 4px rgba(0,0,0,.08);}
 .logo{font-size:1.3rem;font-weight:800;letter-spacing:-0.03em;}.logo span{color:var(--accent);}
 .badge{font-family:'Space Mono',monospace;font-size:.65rem;background:var(--bg);color:var(--muted);padding:.25rem .6rem;border-radius:2px;letter-spacing:.08em;text-transform:uppercase;border:1px solid var(--border);}
 main{display:grid;grid-template-columns:310px 1fr;height:calc(100vh - 57px);}
@@ -65,6 +65,7 @@ aside{background:var(--surface);border-right:1px solid var(--border);display:fle
 .bulk-btn:hover{opacity:.88;}
 .bulk-feedback{font-family:'Space Mono',monospace;font-size:.65rem;margin-top:.4rem;min-height:1rem;}
 .bulk-feedback.ok{color:#16a34a;}.bulk-feedback.err{color:var(--accent2);}
+.win-grid{display:grid;grid-template-columns:1fr 1fr;gap:.45rem;}
 .canvas-area{position:relative;background:var(--bg);}
 canvas{width:100%;height:100%;display:block;cursor:crosshair;}
 .zoom-controls{position:absolute;bottom:1.1rem;left:1.1rem;display:flex;flex-direction:column;gap:.3rem;}
@@ -77,8 +78,30 @@ canvas{width:100%;height:100%;display:block;cursor:crosshair;}
 </head>
 <body>
 <header>
-  <div class="logo">Dream<span>Curve</span></div>
-  <div class="badge">Real-Time Curve Fitting</div>
+  <div style="display:flex;align-items:center;gap:1rem;">
+    <div class="asu-fork" style="display:flex;align-items:center;gap:.75rem;">
+      <!-- ASU pitchfork mark -->
+      <svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Arizona State University">
+        <rect width="36" height="36" rx="4" fill="#8C1D40"/>
+        <!-- Trident / pitchfork: three tines + crossbar + handle -->
+        <!-- Center tine -->
+        <rect x="16" y="5" width="4" height="16" rx="1" fill="#FFC627"/>
+        <!-- Left tine (angled) -->
+        <rect x="8" y="5" width="3.5" height="11" rx="1" fill="#FFC627" transform="rotate(12 8 5)"/>
+        <!-- Right tine (angled) -->
+        <rect x="24.5" y="5" width="3.5" height="11" rx="1" fill="#FFC627" transform="rotate(-12 28 5)"/>
+        <!-- Cross bar -->
+        <rect x="7" y="15" width="22" height="3" rx="1.5" fill="#FFC627"/>
+        <!-- Handle -->
+        <rect x="16" y="18" width="4" height="13" rx="1" fill="#FFC627"/>
+      </svg>
+      <div>
+        <div style="font-family:'Space Mono',monospace;font-size:.55rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);line-height:1.2">Arizona State University</div>
+        <div class="logo" style="line-height:1.1">Dream<span>Plot</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="badge" style="border-color:var(--gold);color:var(--maroon);">Real-Time Curve Fitting</div>
 </header>
 <main>
   <aside>
@@ -139,6 +162,16 @@ canvas{width:100%;height:100%;display:block;cursor:crosshair;}
       </div>
       <div class="predict-result" id="predictOut"><span class="pmuted">Fit a curve first...</span></div>
     </div>
+    <div class="ss">
+      <h2>Plot Window</h2>
+      <div class="win-grid">
+        <div class="field"><label id="winXMinLbl">x min</label><input type="number" id="winXMin" step="any" placeholder="auto" oninput="applyWindow()"></div>
+        <div class="field"><label id="winXMaxLbl">x max</label><input type="number" id="winXMax" step="any" placeholder="auto" oninput="applyWindow()"></div>
+        <div class="field"><label id="winYMinLbl">y min</label><input type="number" id="winYMin" step="any" placeholder="auto" oninput="applyWindow()"></div>
+        <div class="field"><label id="winYMaxLbl">y max</label><input type="number" id="winYMax" step="any" placeholder="auto" oninput="applyWindow()"></div>
+      </div>
+      <p class="bulk-hint" style="margin-top:.45rem">Leave blank to auto-fit that bound.</p>
+    </div>
     <div class="pts-list">
       <h2>Data Points</h2>
       <div id="ptList"><div class="empty">No points yet</div></div>
@@ -188,7 +221,12 @@ function fitToPoints(){
 
 function zoomAround(factor,wx,wy){vpCX=wx+(vpCX-wx)*factor;vpCY=wy+(vpCY-wy)*factor;vpHW*=factor;vpHH*=factor;autoFit=false;draw();}
 function zoomBtn(f){zoomAround(f,vpCX,vpCY);}
-function resetView(){autoFit=true;fitToPoints();draw();}
+function resetView(){
+  autoFit=true;fitToPoints();
+  // Clear manual window inputs so auto-fit takes over
+  ['winXMin','winXMax','winYMin','winYMax'].forEach(id=>{document.getElementById(id).value='';});
+  draw();
+}
 
 function addPt(x,y){
   const xi=document.getElementById('xI'),yi=document.getElementById('yI');
@@ -318,6 +356,7 @@ function updateErrorDisplay(mape){
 
 function updateUI(){
   const xn=xLbl(),yn=yLbl();
+  syncWindowLabels();
   document.getElementById('xFieldLbl').textContent=xn;
   document.getElementById('yFieldLbl').textContent=yn;
   document.getElementById('pxLbl').textContent=`Enter ${xn} →`;
@@ -357,6 +396,34 @@ function importBulk(){
     fb.className='bulk-feedback err';
   }
   setTimeout(()=>{fb.textContent='';fb.className='bulk-feedback';},4000);
+}
+
+function applyWindow(){
+  const xMinV=parseFloat(document.getElementById('winXMin').value);
+  const xMaxV=parseFloat(document.getElementById('winXMax').value);
+  const yMinV=parseFloat(document.getElementById('winYMin').value);
+  const yMaxV=parseFloat(document.getElementById('winYMax').value);
+  const hasAny=!isNaN(xMinV)||!isNaN(xMaxV)||!isNaN(yMinV)||!isNaN(yMaxV);
+  if(!hasAny){autoFit=true;fitToPoints();draw();return;}
+  // Start from current view, override only filled fields
+  const b=vpBounds();
+  const xMin=isNaN(xMinV)?b.xMin:xMinV;
+  const xMax=isNaN(xMaxV)?b.xMax:xMaxV;
+  const yMin=isNaN(yMinV)?b.yMin:yMinV;
+  const yMax=isNaN(yMaxV)?b.yMax:yMaxV;
+  if(xMax<=xMin||yMax<=yMin)return; // invalid range
+  vpCX=(xMin+xMax)/2; vpCY=(yMin+yMax)/2;
+  vpHW=(xMax-xMin)/2; vpHH=(yMax-yMin)/2;
+  autoFit=false;
+  draw();
+}
+
+function syncWindowLabels(){
+  const xn=xLbl(),yn=yLbl();
+  document.getElementById('winXMinLbl').textContent=xn+' min';
+  document.getElementById('winXMaxLbl').textContent=xn+' max';
+  document.getElementById('winYMinLbl').textContent=yn+' min';
+  document.getElementById('winYMaxLbl').textContent=yn+' max';
 }
 
 function update(){lastFit=calcFit();if(autoFit)fitToPoints();updateUI();draw();}
