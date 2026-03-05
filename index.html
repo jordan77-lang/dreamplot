@@ -74,34 +74,24 @@ canvas{width:100%;height:100%;display:block;cursor:crosshair;}
 .zoom-btn:hover,.reset-btn:hover{border-color:var(--accent);color:var(--accent);}
 .hint{position:absolute;bottom:1rem;right:1.1rem;font-family:'Space Mono',monospace;font-size:.58rem;color:var(--muted);text-align:right;line-height:1.8;}
 ::-webkit-scrollbar{width:3px;}::-webkit-scrollbar-thumb{background:var(--border2);}
+/* Point tooltip */
+.pt-tooltip{position:absolute;background:var(--surface);border:1px solid var(--border2);border-left:3px solid var(--accent);border-radius:6px;padding:.7rem .85rem;box-shadow:0 4px 16px rgba(0,0,0,.13);font-family:'Space Mono',monospace;font-size:.7rem;min-width:170px;z-index:100;pointer-events:auto;animation:tipIn .12s ease;}
+@keyframes tipIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+.pt-tooltip .tip-coord{font-weight:700;color:var(--text);margin-bottom:.45rem;font-size:.75rem;}
+.pt-tooltip .tip-row{display:flex;justify-content:space-between;gap:.8rem;color:var(--muted);margin-bottom:.2rem;}
+.pt-tooltip .tip-val{color:var(--text);font-weight:700;}
+.pt-tooltip .tip-del{margin-top:.6rem;width:100%;background:none;border:1px solid var(--accent2);color:var(--accent2);font-family:'Space Mono',monospace;font-size:.65rem;padding:.35rem;border-radius:4px;cursor:pointer;transition:all .15s;}
+.pt-tooltip .tip-del:hover{background:var(--accent2);color:#fff;}
+/* Undo toast */
+.undo-toast{position:absolute;bottom:3.2rem;left:50%;transform:translateX(-50%);background:var(--text);color:#fff;font-family:'Space Mono',monospace;font-size:.62rem;padding:.35rem .8rem;border-radius:4px;opacity:0;transition:opacity .2s;pointer-events:none;white-space:nowrap;}
+.undo-toast.show{opacity:1;}
+
 </style>
 </head>
 <body>
 <header>
-  <div style="display:flex;align-items:center;gap:1rem;">
-    <div class="asu-fork" style="display:flex;align-items:center;gap:.75rem;">
-      <!-- ASU pitchfork mark -->
-      <svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Arizona State University">
-        <rect width="36" height="36" rx="4" fill="#8C1D40"/>
-        <!-- Trident / pitchfork: three tines + crossbar + handle -->
-        <!-- Center tine -->
-        <rect x="16" y="5" width="4" height="16" rx="1" fill="#FFC627"/>
-        <!-- Left tine (angled) -->
-        <rect x="8" y="5" width="3.5" height="11" rx="1" fill="#FFC627" transform="rotate(12 8 5)"/>
-        <!-- Right tine (angled) -->
-        <rect x="24.5" y="5" width="3.5" height="11" rx="1" fill="#FFC627" transform="rotate(-12 28 5)"/>
-        <!-- Cross bar -->
-        <rect x="7" y="15" width="22" height="3" rx="1.5" fill="#FFC627"/>
-        <!-- Handle -->
-        <rect x="16" y="18" width="4" height="13" rx="1" fill="#FFC627"/>
-      </svg>
-      <div>
-        <div style="font-family:'Space Mono',monospace;font-size:.55rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);line-height:1.2">Arizona State University</div>
-        <div class="logo" style="line-height:1.1">Dream<span>Plot</span></div>
-      </div>
-    </div>
-  </div>
-  <div class="badge" style="border-color:var(--gold);color:var(--maroon);">Real-Time Curve Fitting</div>
+  <div class="logo">Dream<span>Plot</span></div>
+  <div class="badge">Real-Time Curve Fitting</div>
 </header>
 <main>
   <aside>
@@ -186,13 +176,17 @@ canvas{width:100%;height:100%;display:block;cursor:crosshair;}
       <button class="zoom-btn" onclick="zoomBtn(1.38)" title="Zoom out">−</button>
       <button class="reset-btn" onclick="resetView()" title="Fit to all points">FIT</button>
     </div>
-    <div class="hint">Scroll to zoom · Shift+drag to pan<br>Click to add a point</div>
+    <div class="hint">Scroll to zoom · Shift+drag to pan<br>Click to add · Click point to inspect</div>
+    <div class="pt-tooltip" id="ptTooltip" style="display:none"></div>
+    <div class="undo-toast" id="undoToast"></div>
   </div>
 </main>
 
 <script>
 let pts=[],fit='linear',lastFit=null;
 let vpCX=0,vpCY=0,vpHW=6,vpHH=5,autoFit=true;
+let undoStack=[],redoStack=[];
+let selectedPt=null; // index of currently selected point
 const c=document.getElementById('c'),ctx=c.getContext('2d');
 const PAD={l:58,b:46,t:22,r:22};
 
@@ -228,15 +222,35 @@ function resetView(){
   draw();
 }
 
+function snapshot(){undoStack.push(JSON.stringify(pts));if(undoStack.length>80)undoStack.shift();redoStack=[];}
+function undo(){
+  if(!undoStack.length){showToast('Nothing to undo');return;}
+  redoStack.push(JSON.stringify(pts));
+  pts=JSON.parse(undoStack.pop());
+  selectedPt=null;hideTooltip();autoFit=true;update();showToast('Undo');
+}
+function redo(){
+  if(!redoStack.length){showToast('Nothing to redo');return;}
+  undoStack.push(JSON.stringify(pts));
+  pts=JSON.parse(redoStack.pop());
+  selectedPt=null;hideTooltip();autoFit=true;update();showToast('Redo');
+}
+let toastTimer=null;
+function showToast(msg){
+  const t=document.getElementById('undoToast');t.textContent=msg;t.classList.add('show');
+  clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove('show'),1200);
+}
+
 function addPt(x,y){
   const xi=document.getElementById('xI'),yi=document.getElementById('yI');
   x=x!==undefined?x:parseFloat(xi.value);y=y!==undefined?y:parseFloat(yi.value);
   if(isNaN(x)||isNaN(y))return;
+  snapshot();
   pts.push({x,y});if(arguments.length===0){xi.value='';yi.value='';xi.focus();}
   autoFit=true;update();
 }
-function delPt(i){pts.splice(i,1);autoFit=true;update();}
-function clearAll(){pts=[];autoFit=true;update();}
+function delPt(i){snapshot();pts.splice(i,1);selectedPt=null;hideTooltip();autoFit=true;update();}
+function clearAll(){snapshot();pts=[];selectedPt=null;hideTooltip();autoFit=true;update();}
 function setFit(t){fit=t;document.querySelectorAll('.fit-btn').forEach(b=>b.classList.toggle('active',b.dataset.fit===t));update();}
 
 // ── Math ──────────────────────────────────────────────────────
@@ -344,7 +358,21 @@ function draw(){
     ctx.stroke();
   }
   // Points
-  pts.forEach(p=>{const sx=gx(p.x),sy=gy(p.y);ctx.beginPath();ctx.arc(sx,sy,5.5*d,0,Math.PI*2);ctx.fillStyle='#e03535';ctx.fill();ctx.strokeStyle='#ffffff';ctx.lineWidth=2*d;ctx.stroke();});
+  pts.forEach((p,i)=>{
+    const sx=gx(p.x),sy=gy(p.y);
+    ctx.beginPath();ctx.arc(sx,sy,5.5*d,0,Math.PI*2);
+    ctx.fillStyle=i===selectedPt?'#ffffff':'#e03535';ctx.fill();
+    ctx.strokeStyle=i===selectedPt?'var(--accent)':'#ffffff';
+    ctx.lineWidth=i===selectedPt?2.5*d:2*d;
+    if(i===selectedPt){
+      // outer ring highlight
+      ctx.stroke();
+      ctx.beginPath();ctx.arc(sx,sy,9*d,0,Math.PI*2);
+      ctx.strokeStyle='rgba(140,29,64,0.4)';ctx.lineWidth=2*d;ctx.stroke();
+    } else {
+      ctx.stroke();
+    }
+  });
 }
 
 // ── UI ────────────────────────────────────────────────────────
@@ -373,6 +401,20 @@ function updateUI(){
     ?'<div class="empty">No points yet</div>'
     :pts.map((p,i)=>`<div class="pt"><span><span class="pi">${i+1}.</span>(${f(p.x,3)}, ${f(p.y,3)})</span><button class="del" onclick="delPt(${i})">✕</button></div>`).join('');
   predict();
+  // Refresh tooltip if a point is selected (equation may have changed)
+  if(selectedPt!==null&&selectedPt<pts.length){
+    const tip=document.getElementById('ptTooltip');
+    if(tip.style.display!=='none'){
+      const r=c.getBoundingClientRect();
+      const{pl,pt:ptY,gW,gH}=gRect();
+      const b=vpBounds();
+      const dpr=devicePixelRatio;
+      const p=pts[selectedPt];
+      const sx=(pl+(p.x-b.xMin)/(b.xMax-b.xMin)*gW)/dpr;
+      const sy=(ptY+gH-(p.y-b.yMin)/(b.yMax-b.yMin)*gH)/dpr;
+      showTooltip(selectedPt,sx,sy);
+    }
+  }
 }
 
 function importBulk(){
@@ -380,6 +422,7 @@ function importBulk(){
   const fb=document.getElementById('bulkFeedback');
   const lines=raw.split(/\n/).map(l=>l.trim()).filter(l=>l.length>0);
   let added=0,skipped=0;
+  snapshot();
   lines.forEach(line=>{
     // Split on comma, tab, or 2+ spaces, or single space — take first two numbers found
     const nums=line.split(/[,\t]+|\s{2,}|\s/).map(s=>parseFloat(s.trim())).filter(n=>!isNaN(n));
@@ -429,6 +472,67 @@ function syncWindowLabels(){
 function update(){lastFit=calcFit();if(autoFit)fitToPoints();updateUI();draw();}
 function resize(){c.width=c.offsetWidth*devicePixelRatio;c.height=c.offsetHeight*devicePixelRatio;if(autoFit)fitToPoints();draw();}
 
+// ── Tooltip ──────────────────────────────────────────────────
+function hitTestPt(cssx, cssy) {
+  // Returns index of point within 10 CSS px, or -1
+  const THRESH = 10;
+  const { pl, pt, gW, gH } = gRect();
+  const b = vpBounds();
+  const dpr = devicePixelRatio;
+  let best = -1, bestD = THRESH;
+  pts.forEach((p, i) => {
+    const sx = (pl + (p.x - b.xMin) / (b.xMax - b.xMin) * gW) / dpr;
+    const sy = (pt + gH - (p.y - b.yMin) / (b.yMax - b.yMin) * gH) / dpr;
+    const d = Math.hypot(cssx - sx, cssy - sy);
+    if (d < bestD) { bestD = d; best = i; }
+  });
+  return best;
+}
+
+function showTooltip(idx, cssx, cssy) {
+  selectedPt = idx;
+  const p = pts[idx];
+  const xn = xLbl(), yn = yLbl();
+  const tip = document.getElementById('ptTooltip');
+  const rect = c.getBoundingClientRect();
+
+  let residualHTML = '';
+  if (lastFit && lastFit.fn) {
+    const pred = lastFit.fn(p.x);
+    if (isFinite(pred)) {
+      const resid = p.y - pred;
+      const pctErr = Math.abs(p.y) > 1e-9 ? Math.abs(resid / p.y) * 100 : null;
+      residualHTML = `
+        <div class="tip-row"><span>Predicted ${yn}</span><span class="tip-val">${f(pred, 4)}</span></div>
+        <div class="tip-row"><span>Residual</span><span class="tip-val">${resid >= 0 ? '+' : ''}${f(resid, 4)}</span></div>
+        ${pctErr !== null ? `<div class="tip-row"><span>% Error</span><span class="tip-val">${pctErr < 0.1 ? '< 0.1' : pctErr.toFixed(2)}%</span></div>` : ''}`;
+    }
+  }
+
+  tip.innerHTML = `
+    <div class="tip-coord">(${f(p.x, 4)}, ${f(p.y, 4)})</div>
+    ${residualHTML || '<div style="color:var(--muted);font-size:.65rem;font-style:italic">No model fitted yet</div>'}
+    <button class="tip-del" onclick="delPt(${idx})">Delete Point</button>`;
+
+  // Position: prefer right of point, flip left if near edge
+  const TIP_W = 185, TIP_H = 150;
+  let left = cssx + 14;
+  let top = cssy - 20;
+  if (left + TIP_W > rect.width - 10) left = cssx - TIP_W - 10;
+  if (top + TIP_H > rect.height - 10) top = rect.height - TIP_H - 10;
+  if (top < 6) top = 6;
+  tip.style.left = left + 'px';
+  tip.style.top = top + 'px';
+  tip.style.display = 'block';
+  draw(); // redraw to show highlight
+}
+
+function hideTooltip() {
+  selectedPt = null;
+  document.getElementById('ptTooltip').style.display = 'none';
+  draw();
+}
+
 // ── Interaction ───────────────────────────────────────────────
 c.addEventListener('wheel',e=>{
   e.preventDefault();
@@ -444,13 +548,34 @@ c.addEventListener('contextmenu',e=>e.preventDefault());
 
 c.addEventListener('click',e=>{
   if(e.shiftKey||e.button!==0||drag)return;
-  const r=c.getBoundingClientRect(),{wx,wy}=toWorld(e.clientX-r.left,e.clientY-r.top);
+  const r=c.getBoundingClientRect();
+  const cssx=e.clientX-r.left, cssy=e.clientY-r.top;
+  const hit=hitTestPt(cssx,cssy);
+  if(hit>=0){
+    // Clicked near existing point — show tooltip
+    if(selectedPt===hit){hideTooltip();return;}
+    showTooltip(hit,cssx,cssy);
+    return;
+  }
+  // Clicked empty space — dismiss tooltip or add point
+  if(selectedPt!==null){hideTooltip();return;}
+  const{wx,wy}=toWorld(cssx,cssy);
+  snapshot();
   pts.push({x:+wx.toFixed(3),y:+wy.toFixed(3)});
   lastFit=calcFit();if(autoFit)fitToPoints();
   updateUI();draw();
 });
 
 ['xI','yI'].forEach(id=>document.getElementById(id).addEventListener('keydown',e=>{if(e.key==='Enter')addPt();}));
+
+document.addEventListener('keydown',e=>{
+  const tag=document.activeElement.tagName;
+  if(tag==='INPUT'||tag==='TEXTAREA')return; // don't intercept typing
+  if((e.ctrlKey||e.metaKey)&&e.key==='z'&&!e.shiftKey){e.preventDefault();undo();}
+  else if((e.ctrlKey||e.metaKey)&&(e.key==='y'||(e.key==='z'&&e.shiftKey))){e.preventDefault();redo();}
+  else if(e.key==='Escape'){hideTooltip();}
+  else if((e.key==='Delete'||e.key==='Backspace')&&selectedPt!==null){e.preventDefault();delPt(selectedPt);}
+});
 
 window.addEventListener('resize',resize);
 resize();update();
