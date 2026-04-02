@@ -17,7 +17,7 @@ Live Demo: [https://jordan77-lang.github.io/dreamplot/](https://jordan77-lang.gi
 * **Real-time Fitting:** Equation and statistics update instantly as points are added or moved.
 * **Best Fit Equation:** Displayed with a one-click copy button.
 * **R² Statistic:** Coefficient of Determination to judge the quality of the fit.
-* **MAPE:** Mean Absolute Percentage Error shown alongside R² and point count.
+* **Average % Error:** Shown alongside R² and point count.
 
 ### Prediction
 * **Enter X → get Y:** Calculates the predicted Y value from any X input.
@@ -25,11 +25,13 @@ Live Demo: [https://jordan77-lang.github.io/dreamplot/](https://jordan77-lang.gi
 
 ### Graph
 * **Interactive Canvas:** Scroll to zoom, shift+drag to pan, drag points to move.
+* **Guided Help:** Click the small ? buttons beside titles to open section-specific instructions.
 * **Smart Grid:** Nice-numbers algorithm spaces grid lines at clean 1, 2, or 5 multiples.
 * **Axis Labels:** Automatically switch to scientific notation for very large or small values.
 * **Graph Settings:** Customise axis labels and manually set axis bounds.
 
 ### Export & Persistence
+* **Report PDF:** Opens a polished print-friendly report with the graph, fit summary, and full data table.
 * **PNG Export:** Download the current graph as an image.
 * **CSV Export:** Download raw data points as a spreadsheet-ready file.
 * **Auto-Save:** Automatically saves points, labels, and model to browser LocalStorage.

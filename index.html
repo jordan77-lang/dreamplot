@@ -8,19 +8,24 @@
 @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@400;500;700&display=swap');
 :root{--bg:#faf9f6;--surface:#ffffff;--border:#e8e4df;--border2:#ccc9c0;--accent:#8C1D40;--accent2:#c0392b;--accent3:#7a6000;--text:#1c1c2e;--muted:#666677;--gold:#FFC627;--maroon:#8C1D40;}
 *{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:grid;grid-template-rows:auto 1fr;overflow:hidden;}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);height:100vh;min-height:100vh;display:grid;grid-template-rows:auto minmax(0,1fr);overflow:hidden;}
 header{padding:1rem 2rem;display:flex;align-items:center;justify-content:space-between;border-bottom:3px solid var(--gold);background:var(--surface);box-shadow:0 1px 4px rgba(0,0,0,.08);}
-.logo{font-size:1.3rem;font-weight:800;letter-spacing:-0.03em;}.logo span{color:var(--accent);}
+.brand{display:flex;flex-direction:column;gap:.18rem;}
+.logo{font-size:1.3rem;font-weight:800;letter-spacing:-0.03em;line-height:1;}.logo span{color:var(--accent);}
+.tagline{font-family:'Space Mono',monospace;font-size:.68rem;letter-spacing:.04em;color:var(--accent);font-weight:700;opacity:.92;}
 .header-right{display:flex;align-items:center;gap:.6rem;}
-.badge{font-family:'Space Mono',monospace;font-size:.65rem;background:var(--bg);color:var(--muted);padding:.25rem .6rem;border-radius:2px;letter-spacing:.08em;text-transform:uppercase;border:1px solid var(--border);}
 .hdr-btn{font-family:'Space Mono',monospace;font-size:.62rem;background:var(--bg);color:var(--muted);padding:.25rem .7rem;border-radius:2px;border:1px solid var(--border2);cursor:pointer;text-decoration:none;letter-spacing:.06em;transition:all .15s;display:inline-flex;align-items:center;gap:.3rem;}
 .hdr-btn:hover{border-color:var(--accent);color:var(--accent);}
 .hdr-btn.primary{background:var(--accent);color:#fff;border-color:var(--accent);}
 .hdr-btn.primary:hover{opacity:.88;}
-main{display:grid;grid-template-columns:320px 1fr;height:calc(100vh - 57px);}
+main{display:grid;grid-template-columns:320px 1fr;min-height:0;height:100%;}
 aside{background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow-y:auto;overflow-x:hidden;}
 .ss{padding:.8rem 1.2rem;border-bottom:1px solid var(--border);}
 .ss h2{font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;color:var(--text);margin-bottom:.55rem;font-family:'Space Mono',monospace;font-weight:700;}
+.section-title-row{display:flex;align-items:center;justify-content:space-between;gap:.5rem;margin-bottom:.55rem;}
+.section-title-row h2{margin-bottom:0;}
+.help-trigger{width:18px;height:18px;border-radius:999px;border:1px solid var(--border2);background:var(--bg);color:var(--accent);font-family:'Space Mono',monospace;font-size:.68rem;font-weight:700;line-height:1;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;transition:all .15s;flex-shrink:0;}
+.help-trigger:hover{background:var(--accent);color:#fff;border-color:var(--accent);}
 .var-row{display:grid;grid-template-columns:1fr 1fr;gap:.5rem;}
 .field label{display:block;font-family:'Space Mono',monospace;font-size:.75rem;color:var(--muted);margin-bottom:.3rem;letter-spacing:.06em;}
 .field input[type=text],.field input[type=number]{width:100%;background:#f0ede8;border:1px solid var(--border2);color:var(--text);font-family:'Space Mono',monospace;font-size:.78rem;padding:.5rem .65rem;border-radius:4px;outline:none;transition:border-color .2s;}
@@ -68,23 +73,25 @@ aside{background:var(--surface);border-right:1px solid var(--border);display:fle
 .bulk-feedback{font-family:'DM Sans',sans-serif;font-size:.78rem;margin-top:.4rem;}
 .bulk-feedback.ok{color:#16a34a;}.bulk-feedback.err{color:var(--accent2);}
 .win-grid{display:grid;grid-template-columns:1fr 1fr;gap:.45rem;}
-.canvas-area{position:relative;background:var(--bg);display:flex;flex-direction:column;}
-.main-canvas-wrap{position:relative;flex:1;min-height:0;}
+.canvas-area{position:relative;background:var(--bg);display:flex;flex-direction:column;min-height:0;height:100%;overflow:hidden;}
+.main-canvas-wrap{position:relative;flex:1 1 auto;min-height:320px;overflow:hidden;}
+.main-canvas-wrap::after{content:'';position:absolute;left:0;right:0;bottom:0;height:34px;background:var(--surface);border-top:1px solid var(--border);pointer-events:none;z-index:1;}
 canvas{width:100%;height:100%;display:block;cursor:crosshair;}
+#c{position:absolute;top:0;left:0;width:100%;height:calc(100% - 34px);}
 #residCanvas{width:100%;height:100%;display:block;background:#f7f6f2;border-top:1px solid var(--border);}
 .resid-wrap{height:100px;display:none;flex-shrink:0;position:relative;}
 .resid-wrap.visible{display:block;}
 .resid-label{font-family:'Space Mono',monospace;font-size:.55rem;color:var(--muted);position:absolute;right:.6rem;top:.3rem;}
-.zoom-controls{position:absolute;bottom:1.1rem;left:1.1rem;display:flex;flex-direction:column;gap:.3rem;}
-.zoom-btn,.reset-btn{width:30px;height:30px;background:var(--surface);border:1px solid var(--border2);border-radius:4px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text);transition:all .15s;box-shadow:0 1px 3px rgba(0,0,0,.08);font-family:'Space Mono',monospace;}
-.zoom-btn{font-size:1.1rem;line-height:1;}.reset-btn{font-size:.52rem;color:var(--muted);}
+.zoom-controls{position:absolute;bottom:2rem;left:1.1rem;display:flex;flex-direction:column;gap:.35rem;z-index:3;}
+.zoom-btn,.reset-btn{width:34px;height:34px;background:var(--surface);border:1px solid var(--border2);border-radius:4px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text);transition:all .15s;box-shadow:0 1px 3px rgba(0,0,0,.08);font-family:'Space Mono',monospace;font-weight:700;}
+.zoom-btn{font-size:1.2rem;line-height:1;}.reset-btn{font-size:.58rem;color:#4f4b45;letter-spacing:.05em;}
 .zoom-btn:hover,.reset-btn:hover{border-color:var(--accent);color:var(--accent);}
-.add-mode-btn{position:absolute;top:1rem;left:50%;transform:translateX(-50%);font-family:'Space Mono',monospace;font-size:.65rem;background:var(--surface);border:1.5px solid var(--border2);color:var(--muted);padding:.4rem 1rem;border-radius:20px;cursor:pointer;transition:all .15s;box-shadow:0 1px 4px rgba(0,0,0,.08);white-space:nowrap;z-index:50;}
+.add-mode-btn{position:absolute;top:1rem;left:50%;transform:translateX(-50%);font-family:'Space Mono',monospace;font-size:.72rem;font-weight:700;background:var(--surface);border:1.5px solid var(--border2);color:#4f4b45;padding:.45rem 1rem;border-radius:20px;cursor:pointer;transition:all .15s;box-shadow:0 1px 4px rgba(0,0,0,.08);white-space:nowrap;z-index:50;}
 .add-mode-btn.on{background:var(--accent);color:#fff;border-color:var(--accent);box-shadow:0 2px 8px rgba(140,29,64,.25);}
 .add-mode-btn:hover:not(.on){border-color:var(--accent);color:var(--accent);}
 canvas.add-mode{cursor:crosshair;}
 canvas:not(.add-mode){cursor:default;}
-.hint{position:absolute;bottom:1rem;right:1.1rem;font-family:'Space Mono',monospace;font-size:.65rem;color:var(--muted);text-align:right;line-height:1.8;}
+.hint{position:absolute;bottom:1.95rem;right:1.1rem;font-family:'Space Mono',monospace;font-size:.78rem;font-weight:700;color:#4f4b45;text-align:right;line-height:1.8;z-index:3;}
 ::-webkit-scrollbar{width:7px;}
 ::-webkit-scrollbar-track{background:var(--border);border-radius:3px;}
 ::-webkit-scrollbar-thumb{background:#a8546b;border-radius:3px;min-height:30px;max-height:80px;}
@@ -108,21 +115,38 @@ aside::-webkit-scrollbar-thumb:hover{background:#8C1D40;}
 .undo-toast.show{opacity:1;}
 .save-flash{position:fixed;top:.6rem;right:1rem;font-family:'Space Mono',monospace;font-size:.6rem;color:#16a34a;opacity:0;transition:opacity .3s;pointer-events:none;}
 .save-flash.show{opacity:1;}
+.help-modal{position:fixed;inset:0;display:grid;place-items:center;padding:1rem;z-index:600;}
+.help-modal[hidden]{display:none;}
+.help-backdrop{position:absolute;inset:0;background:rgba(28,28,46,.38);}
+.help-card{position:relative;width:min(560px,100%);max-height:min(78vh,720px);overflow:auto;background:var(--surface);border:1px solid var(--border2);border-top:4px solid var(--accent);border-radius:10px;box-shadow:0 18px 42px rgba(0,0,0,.18);padding:1rem 1rem .9rem;}
+.help-head{display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;margin-bottom:.8rem;}
+.help-head h2{margin:0;font-family:'Space Mono',monospace;font-size:.82rem;letter-spacing:.12em;text-transform:uppercase;color:var(--text);}
+.help-close{border:1px solid var(--border2);background:var(--bg);color:var(--muted);border-radius:6px;padding:.35rem .55rem;cursor:pointer;font-family:'Space Mono',monospace;font-size:.68rem;}
+.help-close:hover{border-color:var(--accent);color:var(--accent);}
+.help-body{color:var(--text);font-size:.92rem;line-height:1.65;}
+.help-body p + p{margin-top:.6rem;}
+.help-body ul{margin:.7rem 0 0 1.1rem;padding:0;}
+.help-body li + li{margin-top:.35rem;}
 .section-divider{display:flex;align-items:center;gap:.5rem;margin:.55rem 0;}
 .section-divider span{font-family:'Space Mono',monospace;font-size:.6rem;color:var(--muted);white-space:nowrap;text-transform:uppercase;letter-spacing:.08em;}
 .section-divider::before,.section-divider::after{content:'';flex:1;height:1px;background:var(--border);}
 [data-tooltip]{position:relative;cursor:help;}
 [data-tooltip]::after{content:attr(data-tooltip);position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);background:var(--text);color:#fff;font-family:'Space Mono',monospace;font-size:.6rem;padding:.35rem .55rem;border-radius:4px;white-space:nowrap;pointer-events:none;opacity:0;transition:opacity .15s;z-index:300;}
 [data-tooltip]:hover::after{opacity:1;}
+@media (max-width:720px){header{padding:.9rem 1rem;align-items:flex-start;gap:.8rem;flex-direction:column;}main{grid-template-columns:1fr;height:auto;}aside{max-height:none;border-right:none;border-bottom:1px solid var(--border);}body{overflow:auto;grid-template-rows:auto auto;} .header-right{flex-wrap:wrap;}}
 </style>
 </head>
 <body>
 <header>
-  <div class="logo">Dream<span>Plot</span></div>
+  <div class="brand">
+    <div class="logo">Dream<span>Plot</span></div>
+    <div class="tagline">Real-time curve fitting is a dream!</div>
+  </div>
   <div class="header-right">
+    <button class="hdr-btn" onclick="openHelp('overview')" title="Open detailed help and learn about the ? buttons">Help</button>
+    <button class="hdr-btn" onclick="exportReport()" title="Open a printable report for PDF export">Generate Report</button>
     <button class="hdr-btn" onclick="exportPNG()" title="Download chart as PNG">⬇ PNG</button>
     <button class="hdr-btn" onclick="exportCSV()" title="Download data as CSV">⬇ CSV</button>
-    <div class="badge">Real-Time Curve Fitting</div>
   </div>
 </header>
 <main>
@@ -130,19 +154,19 @@ aside::-webkit-scrollbar-thumb:hover{background:#8C1D40;}
 
     <!-- 1. DATA ENTRY -->
     <div class="ss">
-      <h2>Data</h2>
+      <div class="section-title-row"><h2>Data</h2><button class="help-trigger" type="button" onclick="openHelp('data')" aria-label="Open data help">?</button></div>
       <p class="bulk-hint" style="margin-top:0;margin-bottom:.4rem">Enter an X and Y value, then click Add.</p>
       <div class="ir">
         <div class="field"><label id="xFieldLbl">X</label><input type="number" id="xI" step="any" placeholder="0"></div>
         <div class="field"><label id="yFieldLbl">Y</label><input type="number" id="yI" step="any" placeholder="0"></div>
         <button class="add-btn" onclick="addPt()">Add</button>
       </div>
-      <h2 style="margin-top:.55rem">Bulk Import</h2>
+      <div class="section-title-row" style="margin-top:.55rem"><h2>Bulk Import</h2><button class="help-trigger" type="button" onclick="openHelp('bulk-import')" aria-label="Open bulk import help">?</button></div>
       <p class="bulk-hint" style="margin-top:0;margin-bottom:.4rem">Paste copied data points below.</p>
       <textarea id="bulkInput" class="bulk-textarea" placeholder="x, y&#10;1, 2.1&#10;2, 4.0&#10;3, 5.9"></textarea>
       <div class="bulk-row" style="margin-top:.55rem"><button class="bulk-btn" onclick="importBulk()">Import Points</button></div>
       <div class="bulk-feedback" id="bulkFeedback"></div>
-      <h2 style="margin-top:.55rem">Data Points</h2>
+      <div class="section-title-row" style="margin-top:.55rem"><h2>Data Points</h2><button class="help-trigger" type="button" onclick="openHelp('data-points')" aria-label="Open data points help">?</button></div>
       <div class="pts-list">
         <div id="ptList"><div class="empty">No points yet</div></div>
       </div>
@@ -151,7 +175,7 @@ aside::-webkit-scrollbar-thumb:hover{background:#8C1D40;}
 
     <!-- 3. FIT TYPE -->
     <div class="ss">
-      <h2>Fit Type</h2>
+      <div class="section-title-row"><h2>Fit Type</h2><button class="help-trigger" type="button" onclick="openHelp('fit-type')" aria-label="Open fit type help">?</button></div>
       <div class="fit-types">
         <button class="fit-btn active" data-fit="linear" onclick="setFit('linear')">Linear</button>
         <button class="fit-btn" data-fit="quadratic" onclick="setFit('quadratic')">Quadratic</button>
@@ -164,11 +188,11 @@ aside::-webkit-scrollbar-thumb:hover{background:#8C1D40;}
 
     <!-- 4. RESULTS (equation + predict merged) -->
     <div class="ss">
-      <h2>Results</h2>
+      <div class="section-title-row"><h2>Results</h2><button class="help-trigger" type="button" onclick="openHelp('results')" aria-label="Open results help">?</button></div>
       <div class="eq-box" id="eqBox"><span class="ph">Add at least 2 points...</span></div>
       <div class="stats-row">
         <div class="stat">
-          <div class="stat-label" data-tooltip="Mean Absolute Percentage Error — lower is better">MAPE</div>
+          <div class="stat-label" data-tooltip="Average percent error across fitted points; lower is better">Average % Error</div>
           <div class="stat-value" id="mapeVal">—</div>
         </div>
         <div class="stat">
@@ -180,7 +204,7 @@ aside::-webkit-scrollbar-thumb:hover{background:#8C1D40;}
           <div class="stat-value" id="np">0</div>
         </div>
       </div>
-      <h2 style="margin-top:.55rem">Predict</h2>
+      <div class="section-title-row" style="margin-top:.55rem"><h2>Predict</h2><button class="help-trigger" type="button" onclick="openHelp('predict')" aria-label="Open predict help">?</button></div>
       <div class="predict-row">
         <div class="field"><label id="pxLbl">Enter X →</label><input type="number" id="pxI" step="any" placeholder="e.g. 5" oninput="predict()"></div>
         <div class="field"><label id="pyLbl">Enter Y →</label><input type="number" id="pyI" step="any" placeholder="e.g. 5" oninput="predict()"></div>
@@ -190,12 +214,12 @@ aside::-webkit-scrollbar-thumb:hover{background:#8C1D40;}
 
     <!-- 5. GRAPH SETTINGS -->
     <div class="ss">
-      <h2>Graph Settings</h2>
+      <div class="section-title-row"><h2>Graph Settings</h2><button class="help-trigger" type="button" onclick="openHelp('graph-settings')" aria-label="Open graph settings help">?</button></div>
       <div class="var-row">
         <div class="field"><label>X-Axis Label</label><input type="text" id="xLabel" value="x" placeholder="x" oninput="update()"></div>
         <div class="field"><label>Y-Axis Label</label><input type="text" id="yLabel" value="y" placeholder="y" oninput="update()"></div>
       </div>
-      <h2 style="margin-top:.55rem">Axis Bounds</h2>
+      <div class="section-title-row" style="margin-top:.55rem"><h2>Axis Bounds</h2><button class="help-trigger" type="button" onclick="openHelp('axis-bounds')" aria-label="Open axis bounds help">?</button></div>
       <p class="bulk-hint" style="margin-top:0;margin-bottom:.4rem">Leave blank to auto-fit that bound.</p>
       <div class="win-grid">
         <div class="field"><label id="winXMinLbl">x min</label><input type="number" id="winXMin" step="any" placeholder="auto" oninput="applyWindow()"></div>
@@ -226,12 +250,34 @@ aside::-webkit-scrollbar-thumb:hover{background:#8C1D40;}
     </div>
   </div>
 </main>
+<div class="help-modal" id="helpModal" hidden>
+  <div class="help-backdrop" onclick="closeHelp()"></div>
+  <div class="help-card" role="dialog" aria-modal="true" aria-labelledby="helpTitle">
+    <div class="help-head">
+      <h2 id="helpTitle">Help</h2>
+      <button class="help-close" type="button" onclick="closeHelp()">Close</button>
+    </div>
+    <div class="help-body" id="helpBody"></div>
+  </div>
+</div>
 <div class="save-flash" id="saveFlash">💾 Saved</div>
 
 <script>
 // ── State ─────────────────────────────────────────────────────
 let pts=[],fit='linear',lastFit=null;
 let addMode=false;
+const SHOW_RESIDUALS=false;
+const HELP_CONTENT={
+  overview:{title:'DreamPlot Help',html:`<p>DreamPlot is a browser-based curve fitting tool for students. Add points, choose a model, read the equation and error summary, then export the graph or report.</p><ul><li>Use the left panel to enter data, choose a fit, and adjust graph settings.</li><li>Use the graph area to zoom, pan, drag points, and inspect the fit visually.</li><li>Use Generate Report when you want a printable summary with the graph, equation, and full data table.</li><li>Click the small <strong>?</strong> buttons beside section titles for more focused help in that part of the app.</li></ul>`},
+  data:{title:'Data Entry Help',html:`<p>Enter one point at a time by typing an x-value and a y-value, then clicking Add.</p><ul><li>Use decimal numbers when needed, such as <strong>2.5</strong> or <strong>-1.2</strong>.</li><li>Press Enter while focused in the data fields to add quickly.</li><li>Each pair is stored as one plotted point on the graph.</li></ul>`},
+  'bulk-import':{title:'Bulk Import Help',html:`<p>Paste copied values from a spreadsheet, lab handout, or document into the bulk import box.</p><ul><li>Use one pair per line, such as <strong>1, 2.1</strong>.</li><li>Tabs, commas, and simple spaces are accepted.</li><li>After pasting, click Import Points to add all valid pairs at once.</li></ul>`},
+  'data-points':{title:'Data Points Help',html:`<p>This list shows every point currently in the graph.</p><ul><li>Use the delete button beside a point to remove it.</li><li>The numbering helps you confirm the order and catch input mistakes.</li><li>Changes here update the graph and fitted model immediately.</li></ul>`},
+  'fit-type':{title:'Fit Type Help',html:`<p>Choose the mathematical model that best matches your data trend.</p><ul><li><strong>Linear</strong> is best for straight-line trends.</li><li><strong>Quadratic</strong> and <strong>Cubic</strong> are useful for curved data.</li><li><strong>Exponential</strong>, <strong>Logarithmic</strong>, and <strong>Power</strong> are helpful for growth, decay, and scaling relationships.</li></ul>`},
+  results:{title:'Results Help',html:`<p>The results area shows the current best-fit equation for the selected model and summary statistics for how well it matches the data.</p><ul><li><strong>Average % Error</strong> estimates the typical percent difference between the model and the data.</li><li><strong>R²</strong> shows how much of the data trend is explained by the fit.</li><li>Use the copy icon to copy the displayed equation.</li></ul>`},
+  predict:{title:'Predict Help',html:`<p>Use Predict when you want the model to estimate one variable from the other.</p><ul><li>Enter an x-value to estimate y.</li><li>Enter a y-value to solve backward for x when the selected model allows a real solution.</li><li>Predictions come from the fitted model, not from connecting raw points one by one.</li></ul>`},
+  'graph-settings':{title:'Graph Settings Help',html:`<p>Graph Settings control how the graph is labeled and displayed.</p><ul><li>Change the axis labels so the graph matches your experiment or assignment.</li><li>These labels are also used in the equation display and PDF report.</li><li>Good labels make the graph easier to understand when shared or printed.</li></ul>`},
+  'axis-bounds':{title:'Axis Bounds Help',html:`<p>Axis bounds let you manually control the visible graph window.</p><ul><li>Leave a box blank to keep that edge on automatic fit.</li><li>Enter custom min and max values when you want to zoom into a specific region.</li><li>If all bound boxes are blank, the graph returns to automatic framing.</li></ul>`}
+};
 function toggleAddMode(){
   addMode=!addMode;
   const btn=document.getElementById('addModeBtn');
@@ -248,10 +294,17 @@ let selectedPt=null;
 let dragPt=null,dragOffX=0,dragOffY=0;
 const c=document.getElementById('c'),ctx=c.getContext('2d');
 const rc=document.getElementById('residCanvas'),rctx=rc.getContext('2d');
-const PAD={l:58,b:46,t:22,r:22};
+const PAD={l:58,b:72,t:22,r:22};
 
 function xLbl(){return document.getElementById('xLabel').value.trim()||'x';}
 function yLbl(){return document.getElementById('yLabel').value.trim()||'y';}
+function openHelp(key){
+  const modal=document.getElementById('helpModal'),title=document.getElementById('helpTitle'),body=document.getElementById('helpBody'),content=HELP_CONTENT[key]||HELP_CONTENT.overview;
+  title.textContent=content.title;
+  body.innerHTML=content.html;
+  modal.hidden=false;
+}
+function closeHelp(){document.getElementById('helpModal').hidden=true;}
 function vpBounds(){return{xMin:vpCX-vpHW,xMax:vpCX+vpHW,yMin:vpCY-vpHH,yMax:vpCY+vpHH};}
 function gRect(){const d=devicePixelRatio,pl=PAD.l*d,pb=PAD.b*d,pt=PAD.t*d,pr=PAD.r*d;return{pl,pt,pb,pr,gW:c.width-pl-pr,gH:c.height-pt-pb};}
 
@@ -289,16 +342,18 @@ function fitToPoints(){
   if(gW>0&&gH>0){const a=gW/gH;if(vpHW/vpHH>a)vpHH=vpHW/a;else vpHW=vpHH*a;}
 }
 
-function zoomAround(factor,wx,wy){vpCX=wx+(vpCX-wx)*factor;vpCY=wy+(vpCY-wy)*factor;vpHW*=factor;vpHH*=factor;autoFit=false;draw();}
+function zoomAround(factor,wx,wy){vpCX=wx+(vpCX-wx)*factor;vpCY=wy+(vpCY-wy)*factor;vpHW*=factor;vpHH*=factor;autoFit=false;draw();drawResid();}
 function zoomBtn(f){zoomAround(f,vpCX,vpCY);}
 function resetView(){
   autoFit=true;
   // ensure canvas pixel size is current before computing layout
   if(c.offsetWidth>0)c.width=c.offsetWidth*devicePixelRatio;
   if(c.offsetHeight>0)c.height=c.offsetHeight*devicePixelRatio;
+  if(rc.offsetWidth>0)rc.width=rc.offsetWidth*devicePixelRatio;
+  if(rc.offsetHeight>0)rc.height=rc.offsetHeight*devicePixelRatio;
   fitToPoints();
   ['winXMin','winXMax','winYMin','winYMax'].forEach(id=>{document.getElementById(id).value='';});
-  draw();
+  draw();drawResid();
 }
 
 function snapshot(){undoStack.push(JSON.stringify(pts));if(undoStack.length>80)undoStack.shift();redoStack=[];}
@@ -352,6 +407,15 @@ function calcR2(actual,predicted){
 function f(n,d=4){if(n===0)return'0';if(Math.abs(n)>=1e4||Math.abs(n)<1e-3)return n.toExponential(2);return+n.toFixed(d)+'';}
 function sg(n){return n>=0?' + ':' - ';}
 
+function fitStats(data,fn){
+  const actual=data.map(p=>p.y),predicted=data.map(p=>fn(p.x));
+  return{
+    mape:calcMAPE(actual,predicted),
+    r2:calcR2(actual,predicted),
+    residuals:data.map((p,i)=>({x:p.x,y:p.y,predicted:predicted[i],residual:p.y-predicted[i]}))
+  };
+}
+
 function powerAlt(a,b,xn,yn){
   let bp=1,bq=1,be=Infinity;
   for(let q=1;q<=16;q++){const p=Math.round(b*q);if(!p)continue;const e=Math.abs(p/q-b);if(e<be){be=e;bp=p;bq=q;}}
@@ -362,11 +426,21 @@ function powerAlt(a,b,xn,yn){
   return`${yn}^${bq} = ${coeff}${xn}^${bp}`;
 }
 
+function chooseClosestRoot(candidates,xMin,xMax){
+  const finite=candidates.filter(v=>isFinite(v));
+  if(!finite.length)return null;
+  const center=(xMin+xMax)/2;
+  const inWindow=finite.filter(v=>v>=xMin&&v<=xMax);
+  const pool=inWindow.length?inWindow:finite;
+  pool.sort((a,b)=>Math.abs(a-center)-Math.abs(b-center));
+  return pool[0];
+}
+
 function fitOne(type,xs,ys,xn,yn){
   try{
-    if(type==='linear'){const co=ls(xs.map(x=>[1,x]),ys);if(!co)return null;const pred=xs.map(x=>co[0]+co[1]*x);return{fn:x=>co[0]+co[1]*x,eq:`${yn} = ${f(co[1])}${xn}${sg(co[0])}${f(Math.abs(co[0]))}`,alt:null,mape:calcMAPE(ys,pred),r2:calcR2(ys,pred)};}
-    if(type==='quadratic'){const co=ls(xs.map(x=>[1,x,x*x]),ys);if(!co)return null;const pred=xs.map(x=>co[0]+co[1]*x+co[2]*x*x);return{fn:x=>co[0]+co[1]*x+co[2]*x*x,eq:`${yn} = ${f(co[2])}${xn}²${sg(co[1])}${f(Math.abs(co[1]))}${xn}${sg(co[0])}${f(Math.abs(co[0]))}`,alt:null,mape:calcMAPE(ys,pred),r2:calcR2(ys,pred)};}
-    if(type==='cubic'){const co=ls(xs.map(x=>[1,x,x*x,x*x*x]),ys);if(!co)return null;const pred=xs.map(x=>co[0]+co[1]*x+co[2]*x*x+co[3]*x*x*x);return{fn:x=>co[0]+co[1]*x+co[2]*x*x+co[3]*x*x*x,eq:`${yn} = ${f(co[3])}${xn}³${sg(co[2])}${f(Math.abs(co[2]))}${xn}²${sg(co[1])}${f(Math.abs(co[1]))}${xn}${sg(co[0])}${f(Math.abs(co[0]))}`,alt:null,mape:calcMAPE(ys,pred),r2:calcR2(ys,pred)};}
+    if(type==='linear'){const co=ls(xs.map(x=>[1,x]),ys);if(!co)return null;const fn=x=>co[0]+co[1]*x,data=xs.map((x,i)=>({x,y:ys[i]})),stats=fitStats(data,fn),inverse=(y)=>Math.abs(co[1])<1e-12?null:(y-co[0])/co[1];return{fn,inverse,eq:`${yn} = ${f(co[1])}${xn}${sg(co[0])}${f(Math.abs(co[0]))}`,alt:null,mape:stats.mape,r2:stats.r2,residuals:stats.residuals};}
+    if(type==='quadratic'){const co=ls(xs.map(x=>[1,x,x*x]),ys);if(!co)return null;const fn=x=>co[0]+co[1]*x+co[2]*x*x,data=xs.map((x,i)=>({x,y:ys[i]})),stats=fitStats(data,fn),inverse=(y,xMin,xMax)=>{if(Math.abs(co[2])<1e-12)return Math.abs(co[1])<1e-12?null:(y-co[0])/co[1];const disc=co[1]*co[1]-4*co[2]*(co[0]-y);if(disc<0)return null;const root=Math.sqrt(disc),den=2*co[2];return chooseClosestRoot([(-co[1]-root)/den,(-co[1]+root)/den],xMin,xMax);};return{fn,inverse,eq:`${yn} = ${f(co[2])}${xn}²${sg(co[1])}${f(Math.abs(co[1]))}${xn}${sg(co[0])}${f(Math.abs(co[0]))}`,alt:null,mape:stats.mape,r2:stats.r2,residuals:stats.residuals};}
+    if(type==='cubic'){const co=ls(xs.map(x=>[1,x,x*x,x*x*x]),ys);if(!co)return null;const fn=x=>co[0]+co[1]*x+co[2]*x*x+co[3]*x*x*x,data=xs.map((x,i)=>({x,y:ys[i]})),stats=fitStats(data,fn);return{fn,eq:`${yn} = ${f(co[3])}${xn}³${sg(co[2])}${f(Math.abs(co[2]))}${xn}²${sg(co[1])}${f(Math.abs(co[1]))}${xn}${sg(co[0])}${f(Math.abs(co[0]))}`,alt:null,mape:stats.mape,r2:stats.r2,residuals:stats.residuals};}
     if(type==='exponential'){const v=xs.map((x,i)=>({x,y:ys[i]})).filter(p=>p.y>0);if(v.length<2)return null;
       // center x to avoid numerical overflow with large x values (e.g. years)
       const xm=v.reduce((s,p)=>s+p.x,0)/v.length;
@@ -374,14 +448,15 @@ function fitOne(type,xs,ys,xn,yn){
       const a0=Math.exp(co[0]),b=co[1];
       // a0·e^(b·(x-xm)) = a0·e^(-b·xm)·e^(b·x)
       const a=a0*Math.exp(-b*xm);
-      const pred=v.map(p=>a*Math.exp(b*p.x));
+      const fn=x=>a*Math.exp(b*x),stats=fitStats(v,fn);
       // choose display form: if |a| is very small/large, show centered form a0·e^(b(x-xm)) instead
       const usesCentered=Math.abs(a)<1e-4||Math.abs(a)>1e8;
       const eq=usesCentered
         ?`${yn} = ${f(a0)}·e^(${f(b)}(${xn}${xm>=0?' - ':' + '}${f(Math.abs(xm),2)}))`
         :`${yn} = ${f(a)}·e^(${f(b)}${xn})`;
-      return{fn:x=>a*Math.exp(b*x),eq,alt:null,mape:calcMAPE(v.map(p=>p.y),pred),r2:calcR2(v.map(p=>p.y),pred)};}
-    if(type==='logarithmic'){const v=xs.map((x,i)=>({x,y:ys[i]})).filter(p=>p.x>0);if(v.length<2)return null;const co=ls(v.map(p=>[1,Math.log(p.x)]),v.map(p=>p.y));if(!co)return null;const pred=v.map(p=>co[0]+co[1]*Math.log(p.x));return{fn:x=>x>0?co[0]+co[1]*Math.log(x):NaN,eq:`${yn} = ${f(co[1])}·ln(${xn})${sg(co[0])}${f(Math.abs(co[0]))}`,alt:null,mape:calcMAPE(v.map(p=>p.y),pred),r2:calcR2(v.map(p=>p.y),pred)};}
+      const inverse=y=>y>0&&a>0&&Math.abs(b)>=1e-12?Math.log(y/a)/b:null;
+      return{fn,inverse,eq,alt:null,mape:stats.mape,r2:stats.r2,residuals:stats.residuals};}
+    if(type==='logarithmic'){const v=xs.map((x,i)=>({x,y:ys[i]})).filter(p=>p.x>0);if(v.length<2)return null;const co=ls(v.map(p=>[1,Math.log(p.x)]),v.map(p=>p.y));if(!co)return null;const fn=x=>x>0?co[0]+co[1]*Math.log(x):NaN,stats=fitStats(v,fn),inverse=y=>Math.abs(co[1])<1e-12?null:Math.exp((y-co[0])/co[1]);return{fn,inverse,eq:`${yn} = ${f(co[1])}·ln(${xn})${sg(co[0])}${f(Math.abs(co[0]))}`,alt:null,mape:stats.mape,r2:stats.r2,residuals:stats.residuals};}
     if(type==='power'){const v=xs.map((x,i)=>({x,y:ys[i]})).filter(p=>p.x>0&&p.y>0);if(v.length<2)return null;
       // center log(x) around its mean to avoid e^(very negative intercept) → 0
       const lxm=v.reduce((s,p)=>s+Math.log(p.x),0)/v.length;
@@ -389,13 +464,19 @@ function fitOne(type,xs,ys,xn,yn){
       const b=co[1];
       // a0·(x/xm)^b = a0/xm^b · x^b, so a = a0·e^(-b·lxm)
       const a0=Math.exp(co[0]),a=a0*Math.exp(-b*lxm);
-      const pred=v.map(p=>a*Math.pow(p.x,b));
+      const fn=x=>x>0?a*Math.pow(x,b):NaN,stats=fitStats(v,fn);
       const usesCentered=Math.abs(a)<1e-4||Math.abs(a)>1e8;
       const xmLabel=f(Math.exp(lxm),2);
       const eq=usesCentered
         ?`${yn} = ${f(a0)}·(${xn}/${xmLabel})^${f(b)}`
         :`${yn} = ${f(a)}·${xn}^${f(b)}`;
-      return{fn:x=>x>0?a*Math.pow(x,b):NaN,eq,alt:usesCentered?null:powerAlt(a,b,xn,yn),mape:calcMAPE(v.map(p=>p.y),pred),r2:calcR2(v.map(p=>p.y),pred)};}
+      const inverse=y=>{
+        if(Math.abs(a)<1e-12||Math.abs(b)<1e-12)return null;
+        if(y===0&&b>0)return 0;
+        if(y<0||y/a<=0)return null;
+        return Math.pow(y/a,1/b);
+      };
+      return{fn,inverse,eq,alt:usesCentered?null:powerAlt(a,b,xn,yn),mape:stats.mape,r2:stats.r2,residuals:stats.residuals};}
   }catch(e){}
   return null;
 }
@@ -407,7 +488,7 @@ function calcFit(){
 }
 
 
-function solveForX(fn,yT,xMin,xMax){
+function solveForXNumeric(fn,yT,xMin,xMax){
   // expand search range well beyond the visible viewport
   const span=xMax-xMin;
   const sMin=xMin-span*10, sMax=xMax+span*10;
@@ -437,7 +518,7 @@ function predict(){
   if(pxV===''&&pyV===''){out.innerHTML=`<span class="pmuted">Enter X or Y to predict</span>`;return;}
   const parts=[];
   if(pxV!==''){const x=parseFloat(pxV);if(!isNaN(x)){const y=lastFit.fn(x);parts.push(isFinite(y)?`${xn}=${f(x,3)} &rarr; <span class="pval">${yn}&approx;${f(y,4)}</span>`:`${xn}=${f(x,3)} &rarr; <span class="pval">undefined</span>`);}}
-  if(pyV!==''){const y=parseFloat(pyV);if(!isNaN(y)){const x=solveForX(lastFit.fn,y,b.xMin,b.xMax);parts.push(x!==null?`${yn}=${f(y,3)} &rarr; <span class="pval">${xn}&approx;${f(x,4)}</span>`:`${yn}=${f(y,3)} &rarr; <span class="pval">no solution in view</span>`);}}
+  if(pyV!==''){const y=parseFloat(pyV);if(!isNaN(y)){const x=lastFit.inverse?lastFit.inverse(y,b.xMin,b.xMax):solveForXNumeric(lastFit.fn,y,b.xMin,b.xMax);parts.push(x!==null&&isFinite(x)?`${yn}=${f(y,3)} &rarr; <span class="pval">${xn}&approx;${f(x,4)}</span>`:`${yn}=${f(y,3)} &rarr; <span class="pval">no real solution</span>`);}}
   out.innerHTML=parts.length?parts.join('<span style="color:var(--border2);margin:0 .35rem">|</span>'):`<span class="pmuted">Enter X or Y to predict</span>`;
 }
 
@@ -464,19 +545,19 @@ function draw(){
   if(ox>=pl&&ox<=pl+gW){ctx.beginPath();ctx.moveTo(ox,pt);ctx.lineTo(ox,pt+gH);ctx.stroke();}
   if(oy>=pt&&oy<=pt+gH){ctx.beginPath();ctx.moveTo(pl,oy);ctx.lineTo(pl+gW,oy);ctx.stroke();}
   // Tick labels
-  ctx.fillStyle='#aaa89e';ctx.font=`${11*d}px "DM Sans",sans-serif`;
+  ctx.fillStyle='#4f4b45';ctx.font=`700 ${14*d}px "DM Sans",sans-serif`;
   ctx.textAlign='center';ctx.textBaseline='top';
   for(let xv=Math.ceil(b.xMin/xStep)*xStep;xv<=b.xMax+xStep*0.01;xv+=xStep){
-    const px=gx(xv),py=Math.min(Math.max(gy(0),pt),pt+gH);ctx.fillText(formatTick(xv,xRange),px,py+5*d);
+    const px=gx(xv),py=Math.min(Math.max(gy(0),pt),pt+gH);ctx.fillText(formatTick(xv,xRange),px,py+10*d);
   }
   ctx.textAlign='right';ctx.textBaseline='middle';
   for(let yv=Math.ceil(b.yMin/yStep)*yStep;yv<=b.yMax+yStep*0.01;yv+=yStep){
-    const px=Math.min(Math.max(gx(0),pl),pl+gW),py=gy(yv);ctx.fillText(formatTick(yv,b.yMax-b.yMin),px-6*d,py);
+    const px=Math.min(Math.max(gx(0),pl),pl+gW),py=gy(yv);ctx.fillText(formatTick(yv,b.yMax-b.yMin),px-8*d,py);
   }
   // Axis labels
-  const xn=xLbl(),yn=yLbl();ctx.fillStyle='#3a3830';ctx.font=`700 ${13*d}px "DM Sans",sans-serif`;
-  ctx.textAlign='center';ctx.textBaseline='alphabetic';ctx.fillText(xn,pl+gW/2,H-18*d);
-  ctx.save();ctx.translate(14*d,pt+gH/2);ctx.rotate(-Math.PI/2);ctx.textAlign='center';ctx.textBaseline='alphabetic';ctx.fillText(yn,0,0);ctx.restore();
+  const xn=xLbl(),yn=yLbl();ctx.fillStyle='#1f1b16';ctx.font=`800 ${19*d}px "DM Sans",sans-serif`;
+  ctx.textAlign='center';ctx.textBaseline='alphabetic';ctx.fillText(xn,pl+gW/2,H-34*d);
+  ctx.save();ctx.translate(20*d,pt+gH/2);ctx.rotate(-Math.PI/2);ctx.textAlign='center';ctx.textBaseline='alphabetic';ctx.fillText(yn,0,0);ctx.restore();
   // Curve
   if(lastFit&&lastFit.fn){
     ctx.beginPath();ctx.strokeStyle='#1a6fcf';ctx.lineWidth=2.5*d;ctx.setLineDash([]);let started=false;
@@ -495,7 +576,61 @@ function draw(){
   });
 }
 
-function drawResid(){}
+function drawResid(){
+  const wrap=document.getElementById('residWrap');
+  if(!SHOW_RESIDUALS){
+    wrap.classList.remove('visible');
+    return;
+  }
+  const residuals=lastFit&&lastFit.residuals?lastFit.residuals.filter(p=>isFinite(p.x)&&isFinite(p.residual)):[];
+  const shouldShow=residuals.length>=2;
+  if(wrap.classList.contains('visible')!==shouldShow){
+    wrap.classList.toggle('visible',shouldShow);
+    resize();
+    return;
+  }
+  if(!shouldShow||rc.width===0||rc.height===0)return;
+
+  const W=rc.width,H=rc.height,d=devicePixelRatio;
+  const padL=PAD.l*d,padR=PAD.r*d,padT=14*d,padB=18*d;
+  const gW=Math.max(W-padL-padR,1),gH=Math.max(H-padT-padB,1);
+  const b=vpBounds(),xStep=niceStep(b.xMax-b.xMin);
+  const maxResid=Math.max(...residuals.map(p=>Math.abs(p.residual)),1e-6);
+  const resPad=maxResid*0.2;
+  const yMax=maxResid+resPad,yMin=-yMax,yStep=niceStep(yMax-yMin,4);
+  const gx=x=>padL+(x-b.xMin)/(b.xMax-b.xMin)*gW;
+  const gy=y=>padT+gH-(y-yMin)/(yMax-yMin)*gH;
+
+  rctx.fillStyle='#f7f6f2';rctx.fillRect(0,0,W,H);
+  rctx.strokeStyle='#e8e5de';rctx.lineWidth=1;
+  for(let xv=Math.ceil(b.xMin/xStep)*xStep;xv<=b.xMax+xStep*0.01;xv+=xStep){
+    const x=gx(xv);rctx.beginPath();rctx.moveTo(x,padT);rctx.lineTo(x,padT+gH);rctx.stroke();
+  }
+  for(let yv=Math.ceil(yMin/yStep)*yStep;yv<=yMax+yStep*0.01;yv+=yStep){
+    const y=gy(yv);rctx.beginPath();rctx.moveTo(padL,y);rctx.lineTo(padL+gW,y);rctx.stroke();
+  }
+
+  const zeroY=gy(0);
+  rctx.strokeStyle='#c0bdb5';rctx.lineWidth=1.5*d;
+  rctx.beginPath();rctx.moveTo(padL,zeroY);rctx.lineTo(padL+gW,zeroY);rctx.stroke();
+
+  rctx.fillStyle='#aaa89e';rctx.font=`${10*d}px "DM Sans",sans-serif`;
+  rctx.textAlign='right';rctx.textBaseline='middle';
+  for(let yv=Math.ceil(yMin/yStep)*yStep;yv<=yMax+yStep*0.01;yv+=yStep){
+    const y=gy(yv);rctx.fillText(formatTick(yv,yMax-yMin),padL-6*d,y);
+  }
+
+  rctx.fillStyle='#3a3830';rctx.font=`700 ${11*d}px "DM Sans",sans-serif`;
+  rctx.save();rctx.translate(14*d,padT+gH/2);rctx.rotate(-Math.PI/2);rctx.textAlign='center';rctx.textBaseline='alphabetic';rctx.fillText('Residual',0,0);rctx.restore();
+
+  residuals.forEach(p=>{
+    if(p.x<b.xMin||p.x>b.xMax)return;
+    const sx=gx(p.x),sy=gy(p.residual);
+    rctx.beginPath();rctx.arc(sx,sy,4.5*d,0,Math.PI*2);
+    rctx.fillStyle='#e03535';rctx.fill();
+    rctx.strokeStyle='#ffffff';rctx.lineWidth=1.75*d;rctx.stroke();
+  });
+}
 
 // ── LocalStorage ──────────────────────────────────────────────
 let saveTimer=null;
@@ -529,6 +664,139 @@ function exportCSV(){
   const blob=new Blob([rows.join('\n')],{type:'text/csv'});
   const link=document.createElement('a');
   link.download='dreamplot_data.csv';link.href=URL.createObjectURL(blob);link.click();
+}
+
+function escapeHtml(s){return String(s).replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));}
+function fitLabel(){return fit.charAt(0).toUpperCase()+fit.slice(1);}
+function reportDate(){return new Date().toLocaleString();}
+
+function buildReportHTML(){
+  const xn=xLbl(),yn=yLbl(),bounds=vpBounds();
+  const chartSrc=c.toDataURL('image/png');
+  const eq=lastFit?lastFit.eq:'No fitted model';
+  const avgErr=lastFit?`${lastFit.mape<0.1?'< 0.1':lastFit.mape.toFixed(1)}%`:'—';
+  const r2=lastFit&&isFinite(lastFit.r2)?lastFit.r2.toFixed(4):'—';
+  const rows=pts.length?pts.map((p,i)=>`<tr><td>${i+1}</td><td>${escapeHtml(f(p.x,4))}</td><td>${escapeHtml(f(p.y,4))}</td></tr>`).join(''):'<tr><td colspan="3">No points available</td></tr>';
+  const notes=pts.length<2?'Add at least two points to include a fitted model in the report.':(lastFit?'Summary reflects the currently selected model and visible graph state.':'The current model could not be fit to the available data.');
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>DreamPlot Report</title>
+<style>
+  @page{size:letter;margin:.55in;}
+  body{font-family:'DM Sans',Arial,sans-serif;color:#1c1c2e;margin:0;background:#f6f2ec;}
+  .page{max-width:980px;margin:0 auto;background:#fff;padding:28px 30px 36px;}
+  .top{display:flex;justify-content:space-between;gap:24px;align-items:flex-start;border-bottom:3px solid #FFC627;padding-bottom:18px;margin-bottom:20px;}
+  .brand{display:flex;flex-direction:column;gap:6px;}
+  .logo{font-size:30px;font-weight:800;letter-spacing:-.03em;line-height:1;}
+  .logo span{color:#8C1D40;}
+  .tagline{font-family:'Space Mono',monospace;color:#8C1D40;font-size:12px;font-weight:700;}
+  .meta{font-family:'Space Mono',monospace;font-size:11px;color:#666677;text-align:right;line-height:1.7;}
+  .section{margin-top:22px;}
+  .section h2{font-family:'Space Mono',monospace;font-size:12px;text-transform:uppercase;letter-spacing:.12em;margin:0 0 10px;color:#1c1c2e;}
+  .plots{display:grid;gap:18px;}
+  .card{background:#faf9f6;border:1px solid #e8e4df;border-radius:10px;padding:14px 16px;}
+  .chart{width:100%;border:1px solid #e8e4df;border-radius:10px;background:#f7f6f2;}
+  .chart.main{min-height:420px;object-fit:contain;}
+  .chart.residual{min-height:180px;object-fit:contain;}
+  .summary-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:18px;align-items:start;}
+  .stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  .stat{background:#faf9f6;border:1px solid #e8e4df;border-radius:10px;padding:12px;}
+  .stat-label{font-family:'Space Mono',monospace;font-size:10px;color:#666677;text-transform:uppercase;letter-spacing:.08em;}
+  .stat-value{margin-top:6px;font-size:20px;font-weight:700;}
+  .eq{font-family:'Space Mono',monospace;font-size:13px;color:#8C1D40;line-height:1.6;word-break:break-word;}
+  .subnote{font-size:12px;line-height:1.6;color:#666677;margin-top:8px;}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
+  table{width:100%;border-collapse:collapse;background:#fff;border:1px solid #e8e4df;border-radius:10px;overflow:hidden;}
+  th,td{padding:10px 12px;border-bottom:1px solid #eee7df;text-align:left;font-size:13px;}
+  th{font-family:'Space Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:.08em;background:#faf9f6;color:#666677;}
+  tr:last-child td{border-bottom:none;}
+  .notes{font-size:13px;line-height:1.7;color:#444458;}
+  .bounds{display:grid;grid-template-columns:1fr 1fr;gap:8px;font-family:'Space Mono',monospace;font-size:11px;color:#444458;}
+  .actions{margin-top:24px;display:flex;justify-content:flex-end;gap:10px;}
+  .btn{font-family:'Space Mono',monospace;font-size:11px;padding:10px 14px;border-radius:8px;border:1px solid #ccc9c0;background:#fff;cursor:pointer;}
+  .btn.primary{background:#8C1D40;color:#fff;border-color:#8C1D40;}
+  @media (max-width:900px){.summary-grid,.grid{grid-template-columns:1fr;}}
+  @media print{body{background:#fff;} .page{max-width:none;padding:0;} .actions{display:none;} }
+</style>
+</head>
+<body>
+  <div class="page">
+    <div class="top">
+      <div class="brand">
+        <div class="logo">Dream<span>Plot</span></div>
+        <div class="tagline">Real-time curve fitting is a dream!</div>
+      </div>
+      <div class="meta">
+        <div>Report generated ${escapeHtml(reportDate())}</div>
+        <div>Model: ${escapeHtml(fitLabel())}</div>
+        <div>Points: ${pts.length}</div>
+      </div>
+    </div>
+
+    <div class="plots section" style="margin-top:0">
+      <div>
+        <h2>Plot</h2>
+        <img class="chart main" src="${chartSrc}" alt="DreamPlot chart">
+      </div>
+    </div>
+
+    <div class="summary-grid section">
+      <div>
+        <h2>Results</h2>
+        <div class="card"><div class="eq">${escapeHtml(eq)}</div></div>
+      </div>
+      <div>
+        <h2>Summary</h2>
+        <div class="stats">
+          <div class="stat"><div class="stat-label">Average % Error</div><div class="stat-value">${avgErr}</div></div>
+          <div class="stat"><div class="stat-label">R²</div><div class="stat-value">${r2}</div></div>
+          <div class="stat"><div class="stat-label">X Label</div><div class="stat-value">${escapeHtml(xn)}</div></div>
+          <div class="stat"><div class="stat-label">Y Label</div><div class="stat-value">${escapeHtml(yn)}</div></div>
+        </div>
+        <div class="section">
+          <h2>Graph Bounds</h2>
+          <div class="card bounds">
+            <div>${escapeHtml(xn)} min: ${escapeHtml(f(bounds.xMin,4))}</div>
+            <div>${escapeHtml(xn)} max: ${escapeHtml(f(bounds.xMax,4))}</div>
+            <div>${escapeHtml(yn)} min: ${escapeHtml(f(bounds.yMin,4))}</div>
+            <div>${escapeHtml(yn)} max: ${escapeHtml(f(bounds.yMax,4))}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid section">
+      <div>
+        <h2>Data Points</h2>
+        <table>
+          <thead><tr><th>#</th><th>${escapeHtml(xn)}</th><th>${escapeHtml(yn)}</th></tr></thead>
+          <tbody>${rows}</tbody>
+        </table>
+      </div>
+      <div>
+        <h2>Notes</h2>
+        <div class="card notes">${escapeHtml(notes)}</div>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button class="btn" onclick="window.close()">Close</button>
+      <button class="btn primary" onclick="window.print()">Save as PDF</button>
+    </div>
+  </div>
+</body>
+</html>`;
+}
+
+function exportReport(){
+  const w=window.open('','dreamplot-report','width=1100,height=900');
+  if(!w){showToast('Popup blocked');return;}
+  w.document.open();
+  w.document.write(buildReportHTML());
+  w.document.close();
+  w.focus();
 }
 
 // ── Equation copy ─────────────────────────────────────────────
@@ -617,14 +885,14 @@ function applyWindow(){
   const xMinV=parseFloat(document.getElementById('winXMin').value),xMaxV=parseFloat(document.getElementById('winXMax').value);
   const yMinV=parseFloat(document.getElementById('winYMin').value),yMaxV=parseFloat(document.getElementById('winYMax').value);
   const hasAny=!isNaN(xMinV)||!isNaN(xMaxV)||!isNaN(yMinV)||!isNaN(yMaxV);
-  if(!hasAny){autoFit=true;fitToPoints();draw();return;}
+  if(!hasAny){autoFit=true;fitToPoints();draw();drawResid();return;}
   const b=vpBounds();
   const xMin=isNaN(xMinV)?b.xMin:xMinV,xMax=isNaN(xMaxV)?b.xMax:xMaxV;
   const yMin=isNaN(yMinV)?b.yMin:yMinV,yMax=isNaN(yMaxV)?b.yMax:yMaxV;
   if(xMax<=xMin||yMax<=yMin)return;
   vpCX=(xMin+xMax)/2;vpCY=(yMin+yMax)/2;
   vpHW=Math.max((xMax-xMin)/2,1e-6);vpHH=Math.max((yMax-yMin)/2,1e-6);
-  autoFit=false;draw();
+  autoFit=false;draw();drawResid();
 }
 function syncWindowLabels(){
   const xn=xLbl(),yn=yLbl();
@@ -634,7 +902,7 @@ function syncWindowLabels(){
 
 function update(){lastFit=calcFit();if(autoFit)fitToPoints();updateUI();draw();drawResid();saveState();}
 let resizeTimer;
-function resize(){c.width=c.offsetWidth*devicePixelRatio;c.height=c.offsetHeight*devicePixelRatio;if(autoFit)fitToPoints();draw();drawResid();}
+function resize(){c.width=c.offsetWidth*devicePixelRatio;c.height=c.offsetHeight*devicePixelRatio;rc.width=rc.offsetWidth*devicePixelRatio;rc.height=rc.offsetHeight*devicePixelRatio;if(autoFit)fitToPoints();draw();drawResid();}
 
 // ── Tooltip ───────────────────────────────────────────────────
 function hitTestPt(cssx,cssy){
@@ -677,12 +945,12 @@ c.addEventListener('mousedown',e=>{
   }
 });
 window.addEventListener('mousemove',e=>{
-  if(panDrag){const r=c.getBoundingClientRect(),dx=(e.clientX-panDrag.sx)/r.width*2*vpHW,dy=(e.clientY-panDrag.sy)/r.height*2*vpHH;vpCX=panDrag.cx-dx;vpCY=panDrag.cy+dy;autoFit=false;draw();return;}
+  if(panDrag){const r=c.getBoundingClientRect(),dx=(e.clientX-panDrag.sx)/r.width*2*vpHW,dy=(e.clientY-panDrag.sy)/r.height*2*vpHH;vpCX=panDrag.cx-dx;vpCY=panDrag.cy+dy;autoFit=false;draw();drawResid();return;}
   if(dragPt!==null){
     const r=c.getBoundingClientRect();
     const{wx,wy}=toWorld(e.clientX-r.left,e.clientY-r.top);
     pts[dragPt]={x:+wx.toFixed(4),y:+wy.toFixed(4)};
-    lastFit=calcFit();updateUI();draw();
+    lastFit=calcFit();updateUI();draw();drawResid();
     return;
   }
 });
@@ -707,6 +975,7 @@ c.addEventListener('click',e=>{
 ['xI','yI'].forEach(id=>document.getElementById(id).addEventListener('keydown',e=>{if(e.key==='Enter')addPt();}));
 
 document.addEventListener('keydown',e=>{
+  if(!document.getElementById('helpModal').hidden&&e.key==='Escape'){e.preventDefault();closeHelp();return;}
   const tag=document.activeElement.tagName;
   if(tag==='INPUT'||tag==='TEXTAREA')return;
   if((e.ctrlKey||e.metaKey)&&e.key==='z'&&!e.shiftKey){e.preventDefault();undo();}
