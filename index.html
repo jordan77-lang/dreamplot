@@ -262,7 +262,7 @@ function toWorld(csx,csy){
 
 // ── Nice grid ticks ────────────────────────────────────────────
 function niceStep(range,target=7){
-  if(range<=0||!isFinite(range))return 1;
+  if(range<=0||!isFinite(range)||range<1e-12)return 1;
   const rough=range/target;
   const mag=Math.pow(10,Math.floor(Math.log10(rough)));
   const f=rough/mag;
@@ -349,7 +349,7 @@ function calcR2(actual,predicted){
   return 1-ssRes/ssTot;
 }
 
-function f(n,d=4){if(n===0||Math.abs(n)<Number.EPSILON*1e6&&d>=4)return'0';if(Math.abs(n)>=1e4||Math.abs(n)<1e-3)return n.toExponential(2);return+n.toFixed(d)+'';}
+function f(n,d=4){if(n===0)return'0';if(Math.abs(n)>=1e4||Math.abs(n)<1e-3)return n.toExponential(2);return+n.toFixed(d)+'';}
 function sg(n){return n>=0?' + ':' - ';}
 
 function powerAlt(a,b,xn,yn){
@@ -367,7 +367,7 @@ function fitOne(type,xs,ys,xn,yn){
     if(type==='linear'){const co=ls(xs.map(x=>[1,x]),ys);if(!co)return null;const pred=xs.map(x=>co[0]+co[1]*x);return{fn:x=>co[0]+co[1]*x,eq:`${yn} = ${f(co[1])}${xn}${sg(co[0])}${f(Math.abs(co[0]))}`,alt:null,mape:calcMAPE(ys,pred),r2:calcR2(ys,pred)};}
     if(type==='quadratic'){const co=ls(xs.map(x=>[1,x,x*x]),ys);if(!co)return null;const pred=xs.map(x=>co[0]+co[1]*x+co[2]*x*x);return{fn:x=>co[0]+co[1]*x+co[2]*x*x,eq:`${yn} = ${f(co[2])}${xn}²${sg(co[1])}${f(Math.abs(co[1]))}${xn}${sg(co[0])}${f(Math.abs(co[0]))}`,alt:null,mape:calcMAPE(ys,pred),r2:calcR2(ys,pred)};}
     if(type==='cubic'){const co=ls(xs.map(x=>[1,x,x*x,x*x*x]),ys);if(!co)return null;const pred=xs.map(x=>co[0]+co[1]*x+co[2]*x*x+co[3]*x*x*x);return{fn:x=>co[0]+co[1]*x+co[2]*x*x+co[3]*x*x*x,eq:`${yn} = ${f(co[3])}${xn}³${sg(co[2])}${f(Math.abs(co[2]))}${xn}²${sg(co[1])}${f(Math.abs(co[1]))}${xn}${sg(co[0])}${f(Math.abs(co[0]))}`,alt:null,mape:calcMAPE(ys,pred),r2:calcR2(ys,pred)};}
-    if(type==='exponential'){const v=pts.filter(p=>p.y>0);if(v.length<2)return null;
+    if(type==='exponential'){const v=xs.map((x,i)=>({x,y:ys[i]})).filter(p=>p.y>0);if(v.length<2)return null;
       // center x to avoid numerical overflow with large x values (e.g. years)
       const xm=v.reduce((s,p)=>s+p.x,0)/v.length;
       const co=ls(v.map(p=>[1,p.x-xm]),v.map(p=>Math.log(p.y)));if(!co)return null;
@@ -381,8 +381,8 @@ function fitOne(type,xs,ys,xn,yn){
         ?`${yn} = ${f(a0)}·e^(${f(b)}(${xn}${xm>=0?' - ':' + '}${f(Math.abs(xm),2)}))`
         :`${yn} = ${f(a)}·e^(${f(b)}${xn})`;
       return{fn:x=>a*Math.exp(b*x),eq,alt:null,mape:calcMAPE(v.map(p=>p.y),pred),r2:calcR2(v.map(p=>p.y),pred)};}
-    if(type==='logarithmic'){const v=pts.filter(p=>p.x>0);if(v.length<2)return null;const co=ls(v.map(p=>[1,Math.log(p.x)]),v.map(p=>p.y));if(!co)return null;const pred=v.map(p=>co[0]+co[1]*Math.log(p.x));return{fn:x=>x>0?co[0]+co[1]*Math.log(x):NaN,eq:`${yn} = ${f(co[1])}·ln(${xn})${sg(co[0])}${f(Math.abs(co[0]))}`,alt:null,mape:calcMAPE(v.map(p=>p.y),pred),r2:calcR2(v.map(p=>p.y),pred)};}
-    if(type==='power'){const v=pts.filter(p=>p.x>0&&p.y>0);if(v.length<2)return null;
+    if(type==='logarithmic'){const v=xs.map((x,i)=>({x,y:ys[i]})).filter(p=>p.x>0);if(v.length<2)return null;const co=ls(v.map(p=>[1,Math.log(p.x)]),v.map(p=>p.y));if(!co)return null;const pred=v.map(p=>co[0]+co[1]*Math.log(p.x));return{fn:x=>x>0?co[0]+co[1]*Math.log(x):NaN,eq:`${yn} = ${f(co[1])}·ln(${xn})${sg(co[0])}${f(Math.abs(co[0]))}`,alt:null,mape:calcMAPE(v.map(p=>p.y),pred),r2:calcR2(v.map(p=>p.y),pred)};}
+    if(type==='power'){const v=xs.map((x,i)=>({x,y:ys[i]})).filter(p=>p.x>0&&p.y>0);if(v.length<2)return null;
       // center log(x) around its mean to avoid e^(very negative intercept) → 0
       const lxm=v.reduce((s,p)=>s+Math.log(p.x),0)/v.length;
       const co=ls(v.map(p=>[1,Math.log(p.x)-lxm]),v.map(p=>Math.log(p.y)));if(!co)return null;
@@ -411,8 +411,23 @@ function solveForX(fn,yT,xMin,xMax){
   // expand search range well beyond the visible viewport
   const span=xMax-xMin;
   const sMin=xMin-span*10, sMax=xMax+span*10;
+  // bisect helper
+  function bisect(lo,hi,flo){for(let j=0;j<60;j++){const mid=(lo+hi)/2,ym=fn(mid)-yT;if(Math.abs(ym)<1e-12)return mid;if(flo*ym<=0)hi=mid;else{lo=mid;flo=ym;}}return(lo+hi)/2;}
   const N=2000,step=(sMax-sMin)/N;let x0=sMin,y0=fn(x0)-yT;
-  for(let i=1;i<=N;i++){const x1=sMin+i*step,y1=fn(x1)-yT;if(!isFinite(y0)){y0=y1;x0=x1;continue;}if(isFinite(y1)&&y0*y1<=0){let lo=x0,hi=x1,fy0=y0;for(let j=0;j<60;j++){const mid=(lo+hi)/2,ym=fn(mid)-yT;if(Math.abs(ym)<1e-12)return mid;if(fy0*ym<=0)hi=mid;else{lo=mid;fy0=ym;}}return(lo+hi)/2;}x0=x1;y0=y1;}return null;
+  for(let i=1;i<=N;i++){
+    const x1=sMin+i*step,y1=fn(x1)-yT;
+    if(!isFinite(y0)){
+      // Transitioning from undefined region — scan the boundary densely
+      // to catch roots near x=0 (e.g. power/log fits)
+      if(isFinite(y1)){
+        const FINE=200;for(let k=1;k<=FINE;k++){const xa=x0+(x1-x0)*k/FINE,ya=fn(xa)-yT;if(isFinite(ya)){if(Math.abs(ya)<1e-9)return xa;y0=ya;x0=xa;break;}}
+      }
+      if(!isFinite(y0)){y0=y1;x0=x1;continue;}
+    }
+    if(isFinite(y1)&&y0*y1<=0)return bisect(x0,x1,y0);
+    x0=x1;y0=y1;
+  }
+  return null;
 }
 
 function predict(){
@@ -473,42 +488,14 @@ function draw(){
     const sx=gx(p.x),sy=gy(p.y);
     ctx.beginPath();ctx.arc(sx,sy,5.5*d,0,Math.PI*2);
     ctx.fillStyle=i===selectedPt?'#ffffff':'#e03535';ctx.fill();
-    ctx.strokeStyle=i===selectedPt?'var(--accent)':'#ffffff';
+    ctx.strokeStyle=i===selectedPt?'#8C1D40':'#ffffff';
     ctx.lineWidth=i===selectedPt?2.5*d:2*d;
     if(i===selectedPt){ctx.stroke();ctx.beginPath();ctx.arc(sx,sy,9*d,0,Math.PI*2);ctx.strokeStyle='rgba(140,29,64,0.4)';ctx.lineWidth=2*d;ctx.stroke();}
     else ctx.stroke();
   });
 }
 
-function drawResid(){
-  // Residuals panel is hidden — kept for future use
-  const wrap=document.getElementById('residWrap');
-  wrap.classList.remove('visible');
-  return;
-  if(!lastFit||!lastFit.fn||pts.length<2){wrap.classList.remove('visible');return;}
-  wrap.classList.add('visible');
-  rc.width=rc.offsetWidth*devicePixelRatio;rc.height=rc.offsetHeight*devicePixelRatio;
-  const W=rc.width,H=rc.height,d=devicePixelRatio;
-  rctx.clearRect(0,0,W,H);rctx.fillStyle='#f7f6f2';rctx.fillRect(0,0,W,H);
-  const b=vpBounds(),{pl,gW}=gRect();
-  const resids=pts.map(p=>({x:p.x,r:p.y-lastFit.fn(p.x)})).filter(v=>isFinite(v.r));
-  if(!resids.length)return;
-  const maxR=Math.max(...resids.map(v=>Math.abs(v.r)),1e-10);
-  const pad={l:PAD.l*d,r:PAD.r*d,t:8*d,b:8*d};
-  const rW=W-pad.l-pad.r,rH=H-pad.t-pad.b;
-  // zero line
-  rctx.strokeStyle='#c0bdb5';rctx.lineWidth=1;
-  rctx.beginPath();rctx.moveTo(pad.l,pad.t+rH/2);rctx.lineTo(pad.l+rW,pad.t+rH/2);rctx.stroke();
-  // stems + dots
-  resids.forEach(({x,r})=>{
-    const sx=pad.l+(x-b.xMin)/(b.xMax-b.xMin)*rW;
-    const sy=pad.t+rH/2-r/maxR*(rH/2);
-    rctx.strokeStyle='#aaa89e';rctx.lineWidth=1;
-    rctx.beginPath();rctx.moveTo(sx,pad.t+rH/2);rctx.lineTo(sx,sy);rctx.stroke();
-    rctx.beginPath();rctx.arc(sx,sy,3.5*d,0,Math.PI*2);
-    rctx.fillStyle=r>=0?'#1a6fcf':'#e03535';rctx.fill();
-  });
-}
+function drawResid(){}
 
 // ── LocalStorage ──────────────────────────────────────────────
 let saveTimer=null;
