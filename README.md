@@ -25,13 +25,13 @@ Live Demo: [https://jordan77-lang.github.io/dreamplot/](https://jordan77-lang.gi
 
 ### Graph
 * **Interactive Canvas:** Scroll to zoom, shift+drag to pan, drag points to move.
-* **Guided Help:** Click the small ? buttons beside titles to open section-specific instructions.
+* **Guided Help:** Use the Help button in the header for an overview, then click the small ? buttons beside section titles for more specific instructions.
 * **Smart Grid:** Nice-numbers algorithm spaces grid lines at clean 1, 2, or 5 multiples.
 * **Axis Labels:** Automatically switch to scientific notation for very large or small values.
 * **Graph Settings:** Customise axis labels and manually set axis bounds.
 
 ### Export & Persistence
-* **Report PDF:** Opens a polished print-friendly report with the graph, fit summary, and full data table.
+* **Generate Report:** Opens a polished print-friendly report with the graph, fit summary, and full data table.
 * **PNG Export:** Download the current graph as an image.
 * **CSV Export:** Download raw data points as a spreadsheet-ready file.
 * **Auto-Save:** Automatically saves points, labels, and model to browser LocalStorage.

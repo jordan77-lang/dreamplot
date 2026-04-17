@@ -45,8 +45,8 @@ aside{background:var(--surface);border-right:1px solid var(--border);display:fle
 .eq-alt-label{font-family:'Space Mono',monospace;font-size:.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.18rem;}
 .eq-alt{font-family:'Space Mono',monospace;font-size:.75rem;color:var(--accent3);word-break:break-all;font-weight:700;}
 .ph{font-family:'Space Mono',monospace;font-size:.7rem;color:var(--muted);font-style:italic;}
-.stats-row{display:flex;gap:.5rem;margin-top:.45rem;}
-.stat{flex:1;background:var(--bg);border:1px solid var(--border);border-radius:4px;padding:.35rem .45rem;text-align:center;}
+.stats-row{display:grid;grid-template-columns:1.15fr .85fr .7fr;gap:.5rem;margin-top:.45rem;}
+.stat{background:var(--bg);border:1px solid var(--border);border-radius:4px;padding:.35rem .45rem;text-align:center;min-width:0;}
 .stat-label{font-family:'Space Mono',monospace;font-size:.62rem;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;line-height:1.4;}
 .stat-value{font-family:'Space Mono',monospace;font-size:.9rem;font-weight:700;margin-top:.15rem;color:var(--text);}
 .predict-row{display:grid;grid-template-columns:1fr 1fr;gap:.4rem;margin-bottom:.35rem;}
@@ -192,7 +192,7 @@ aside::-webkit-scrollbar-thumb:hover{background:#8C1D40;}
       <div class="eq-box" id="eqBox"><span class="ph">Add at least 2 points...</span></div>
       <div class="stats-row">
         <div class="stat">
-          <div class="stat-label" data-tooltip="Average percent error across fitted points; lower is better">Average % Error</div>
+          <div class="stat-label" data-tooltip="Average percent error across fitted points; lower is better">Avg % Error</div>
           <div class="stat-value" id="mapeVal">—</div>
         </div>
         <div class="stat">
@@ -270,7 +270,7 @@ const SHOW_RESIDUALS=false;
 const HELP_CONTENT={
   overview:{title:'DreamPlot Help',html:`<p>DreamPlot is a browser-based curve fitting tool for students. Add points, choose a model, read the equation and error summary, then export the graph or report.</p><ul><li>Use the left panel to enter data, choose a fit, and adjust graph settings.</li><li>Use the graph area to zoom, pan, drag points, and inspect the fit visually.</li><li>Use Generate Report when you want a printable summary with the graph, equation, and full data table.</li><li>Click the small <strong>?</strong> buttons beside section titles for more focused help in that part of the app.</li></ul>`},
   data:{title:'Data Entry Help',html:`<p>Enter one point at a time by typing an x-value and a y-value, then clicking Add.</p><ul><li>Use decimal numbers when needed, such as <strong>2.5</strong> or <strong>-1.2</strong>.</li><li>Press Enter while focused in the data fields to add quickly.</li><li>Each pair is stored as one plotted point on the graph.</li></ul>`},
-  'bulk-import':{title:'Bulk Import Help',html:`<p>Paste copied values from a spreadsheet, lab handout, or document into the bulk import box.</p><ul><li>Use one pair per line, such as <strong>1, 2.1</strong>.</li><li>Tabs, commas, and simple spaces are accepted.</li><li>After pasting, click Import Points to add all valid pairs at once.</li></ul>`},
+  'bulk-import':{title:'Bulk Import Help',html:`<p>Paste copied values from a spreadsheet, lab handout, or document into the bulk import box.</p><p>You can enter data in either of the following formats:</p><ul><li>One pair per line (e.g., <strong>1, 2.1</strong>)</li><li>A single column of alternating values (x1, y1, x2, y2, …), where each pair of rows is treated as one point</li></ul><p>Tabs, commas, and simple spaces are accepted.</p><p>After pasting, click <strong>Import Points</strong> to add all valid pairs at once.</p>`},
   'data-points':{title:'Data Points Help',html:`<p>This list shows every point currently in the graph.</p><ul><li>Use the delete button beside a point to remove it.</li><li>The numbering helps you confirm the order and catch input mistakes.</li><li>Changes here update the graph and fitted model immediately.</li></ul>`},
   'fit-type':{title:'Fit Type Help',html:`<p>Choose the mathematical model that best matches your data trend.</p><ul><li><strong>Linear</strong> is best for straight-line trends.</li><li><strong>Quadratic</strong> and <strong>Cubic</strong> are useful for curved data.</li><li><strong>Exponential</strong>, <strong>Logarithmic</strong>, and <strong>Power</strong> are helpful for growth, decay, and scaling relationships.</li></ul>`},
   results:{title:'Results Help',html:`<p>The results area shows the current best-fit equation for the selected model and summary statistics for how well it matches the data.</p><ul><li><strong>Average % Error</strong> estimates the typical percent difference between the model and the data.</li><li><strong>R²</strong> shows how much of the data trend is explained by the fit.</li><li>Use the copy icon to copy the displayed equation.</li></ul>`},
