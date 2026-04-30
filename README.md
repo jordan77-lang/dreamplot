@@ -24,11 +24,12 @@ Live Demo: [https://jordan77-lang.github.io/dreamplot/](https://jordan77-lang.gi
 * **Enter Y → get X:** Solves the model in reverse to find the corresponding X value.
 
 ### Graph
-* **Interactive Canvas:** Scroll to zoom, shift+drag to pan, drag points to move.
+* **Interactive Canvas:** Scroll to zoom, drag to pan, drag points to move.
 * **Guided Help:** Use the Help button in the header for an overview, then click the small ? buttons beside section titles for more specific instructions.
-* **Smart Grid:** Nice-numbers algorithm spaces grid lines at clean 1, 2, or 5 multiples.
+* **Smart Grid:** Nice-numbers algorithm spaces grid lines at clean 1, 2, or 5 multiples. Switches to decade-based ticks on log axes.
 * **Axis Labels:** Automatically switch to scientific notation for very large or small values.
-* **Graph Settings:** Customise axis labels and manually set axis bounds.
+* **Axis Scale:** Choose Linear or Log₁₀ per axis. Log₁₀ is disabled automatically when any value on that axis is zero or negative. Useful for visualizing exponential and power-law relationships as straight lines.
+* **Graph Settings:** Customise axis labels, scale, and manually set axis bounds.
 
 ### Export & Persistence
 * **Generate Report:** Opens a polished print-friendly report with the graph, fit summary, and full data table.

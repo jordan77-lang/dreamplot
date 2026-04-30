@@ -27,6 +27,11 @@ aside{background:var(--surface);border-right:1px solid var(--border);display:fle
 .help-trigger{width:18px;height:18px;border-radius:999px;border:1px solid var(--border2);background:var(--bg);color:var(--accent);font-family:'Space Mono',monospace;font-size:.68rem;font-weight:700;line-height:1;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;transition:all .15s;flex-shrink:0;}
 .help-trigger:hover{background:var(--accent);color:#fff;border-color:var(--accent);}
 .var-row{display:grid;grid-template-columns:1fr 1fr;gap:.5rem;}
+.scale-radios{display:flex;flex-direction:column;gap:.25rem;margin-top:.3rem;}
+.scale-radios label{display:flex;align-items:center;gap:.25rem;font-family:'Space Mono',monospace;font-size:.75rem;color:var(--text);cursor:pointer;white-space:nowrap;}
+.scale-radios label.disabled{color:#bbb;cursor:not-allowed;}
+.scale-radios input[type=radio]{accent-color:var(--accent);cursor:pointer;}
+.scale-radios input[type=radio]:disabled{cursor:not-allowed;}
 .field label{display:block;font-family:'Space Mono',monospace;font-size:.75rem;color:var(--muted);margin-bottom:.3rem;letter-spacing:.06em;}
 .field input[type=text],.field input[type=number]{width:100%;background:#f0ede8;border:1px solid var(--border2);color:var(--text);font-family:'Space Mono',monospace;font-size:.78rem;padding:.5rem .65rem;border-radius:4px;outline:none;transition:border-color .2s;}
 .field input:focus{border-color:var(--accent);box-shadow:0 0 0 2px rgba(140,29,64,.12);}
@@ -76,7 +81,7 @@ aside{background:var(--surface);border-right:1px solid var(--border);display:fle
 .canvas-area{position:relative;background:var(--bg);display:flex;flex-direction:column;min-height:0;height:100%;overflow:hidden;}
 .main-canvas-wrap{position:relative;flex:1 1 auto;min-height:320px;overflow:hidden;}
 .main-canvas-wrap::after{content:'';position:absolute;left:0;right:0;bottom:0;height:34px;background:var(--surface);border-top:1px solid var(--border);pointer-events:none;z-index:1;}
-canvas{width:100%;height:100%;display:block;cursor:crosshair;}
+canvas{width:100%;height:100%;display:block;cursor:grab;}
 #c{position:absolute;top:0;left:0;width:100%;height:calc(100% - 34px);}
 #residCanvas{width:100%;height:100%;display:block;background:#f7f6f2;border-top:1px solid var(--border);}
 .resid-wrap{height:100px;display:none;flex-shrink:0;position:relative;}
@@ -90,6 +95,7 @@ canvas{width:100%;height:100%;display:block;cursor:crosshair;}
 .add-mode-btn.on{background:var(--accent);color:#fff;border-color:var(--accent);box-shadow:0 2px 8px rgba(140,29,64,.25);}
 .add-mode-btn:hover:not(.on){border-color:var(--accent);color:var(--accent);}
 canvas.add-mode{cursor:crosshair;}
+canvas.panning{cursor:grabbing;}
 canvas:not(.add-mode){cursor:default;}
 .hint{position:absolute;bottom:1.95rem;right:1.1rem;font-family:'Space Mono',monospace;font-size:.78rem;font-weight:700;color:#4f4b45;text-align:right;line-height:1.8;z-index:3;}
 ::-webkit-scrollbar{width:7px;}
@@ -216,8 +222,24 @@ aside::-webkit-scrollbar-thumb:hover{background:#8C1D40;}
     <div class="ss">
       <div class="section-title-row"><h2>Graph Settings</h2><button class="help-trigger" type="button" onclick="openHelp('graph-settings')" aria-label="Open graph settings help">?</button></div>
       <div class="var-row">
-        <div class="field"><label>X-Axis Label</label><input type="text" id="xLabel" value="x" placeholder="x" oninput="update()"></div>
-        <div class="field"><label>Y-Axis Label</label><input type="text" id="yLabel" value="y" placeholder="y" oninput="update()"></div>
+        <div class="field">
+          <label>X-Axis Label</label>
+          <input type="text" id="xLabel" value="x" placeholder="x" oninput="update()">
+          <label style="margin-top:.4rem">X Scale</label>
+          <div class="scale-radios">
+            <label><input type="radio" name="xScale" id="xScaleLin" value="linear" checked onchange="update()"> Linear</label>
+            <label id="xScaleLogLbl"><input type="radio" name="xScale" id="xScaleLog" value="log10" onchange="update()"> Log₁₀</label>
+          </div>
+        </div>
+        <div class="field">
+          <label>Y-Axis Label</label>
+          <input type="text" id="yLabel" value="y" placeholder="y" oninput="update()">
+          <label style="margin-top:.4rem">Y Scale</label>
+          <div class="scale-radios">
+            <label><input type="radio" name="yScale" id="yScaleLin" value="linear" checked onchange="update()"> Linear</label>
+            <label id="yScaleLogLbl"><input type="radio" name="yScale" id="yScaleLog" value="log10" onchange="update()"> Log₁₀</label>
+          </div>
+        </div>
       </div>
       <div class="section-title-row" style="margin-top:.55rem"><h2>Axis Bounds</h2><button class="help-trigger" type="button" onclick="openHelp('axis-bounds')" aria-label="Open axis bounds help">?</button></div>
       <p class="bulk-hint" style="margin-top:0;margin-bottom:.4rem">Leave blank to auto-fit that bound.</p>
@@ -240,7 +262,7 @@ aside::-webkit-scrollbar-thumb:hover{background:#8C1D40;}
         <button class="zoom-btn" onclick="zoomBtn(1.38)" title="Zoom out" aria-label="Zoom out">−</button>
         <button class="reset-btn" onclick="resetView()" title="Fit to all points" aria-label="Reset view">FIT</button>
       </div>
-      <div class="hint" id="canvasHint">Scroll to zoom · Shift+drag to pan<br>Drag point to move</div>
+      <div class="hint" id="canvasHint">Scroll to zoom · Drag to pan<br>Drag point to move</div>
       <div class="pt-tooltip" id="ptTooltip" style="display:none"></div>
       <div class="undo-toast" id="undoToast"></div>
     </div>
@@ -275,7 +297,7 @@ const HELP_CONTENT={
   'fit-type':{title:'Fit Type Help',html:`<p>Choose the mathematical model that best matches your data trend.</p><ul><li><strong>Linear</strong> is best for straight-line trends.</li><li><strong>Quadratic</strong> and <strong>Cubic</strong> are useful for curved data.</li><li><strong>Exponential</strong>, <strong>Logarithmic</strong>, and <strong>Power</strong> are helpful for growth, decay, and scaling relationships.</li></ul>`},
   results:{title:'Results Help',html:`<p>The results area shows the current best-fit equation for the selected model and summary statistics for how well it matches the data.</p><ul><li><strong>Average % Error</strong> estimates the typical percent difference between the model and the data.</li><li><strong>R²</strong> shows how much of the data trend is explained by the fit.</li><li>Use the copy icon to copy the displayed equation.</li></ul>`},
   predict:{title:'Predict Help',html:`<p>Use Predict when you want the model to estimate one variable from the other.</p><ul><li>Enter an x-value to estimate y.</li><li>Enter a y-value to solve backward for x when the selected model allows a real solution.</li><li>Predictions come from the fitted model, not from connecting raw points one by one.</li></ul>`},
-  'graph-settings':{title:'Graph Settings Help',html:`<p>Graph Settings control how the graph is labeled and displayed.</p><ul><li>Change the axis labels so the graph matches your experiment or assignment.</li><li>These labels are also used in the equation display and PDF report.</li><li>Good labels make the graph easier to understand when shared or printed.</li></ul>`},
+  'graph-settings':{title:'Graph Settings Help',html:`<p>Graph Settings control how each axis is labeled and scaled.</p><ul><li><strong>Axis Label</strong> — type the name of the variable for that axis. Labels appear on the graph and in the PDF report.</li><li><strong>Scale</strong> — choose <strong>Linear</strong> for evenly-spaced intervals, or <strong>Log₁₀</strong> to display a base-10 logarithmic axis.<ul><li>Log₁₀ is useful when your data spans several orders of magnitude, or when you want to visually linearize an exponential or power-law relationship.</li><li>Log₁₀ is greyed out if any value on that axis is zero or negative — logarithms are undefined for those values.</li></ul></li></ul>`},
   'axis-bounds':{title:'Axis Bounds Help',html:`<p>Axis bounds let you manually control the visible graph window.</p><ul><li>Leave a box blank to keep that edge on automatic fit.</li><li>Enter custom min and max values when you want to zoom into a specific region.</li><li>If all bound boxes are blank, the graph returns to automatic framing.</li></ul>`}
 };
 function toggleAddMode(){
@@ -286,7 +308,7 @@ function toggleAddMode(){
   c.classList.toggle('add-mode',addMode);
   document.getElementById('canvasHint').innerHTML=addMode
     ?'Scroll to zoom · Shift+drag to pan<br>Click to add · Drag point to move'
-    :'Scroll to zoom · Shift+drag to pan<br>Drag point to move';
+    :'Scroll to zoom · Drag to pan<br>Drag point to move';
 }
 let vpCX=0,vpCY=0,vpHW=6,vpHH=5,autoFit=true;
 let undoStack=[],redoStack=[];
@@ -298,6 +320,21 @@ const PAD={l:58,b:72,t:22,r:22};
 
 function xLbl(){return document.getElementById('xLabel').value.trim()||'x';}
 function yLbl(){return document.getElementById('yLabel').value.trim()||'y';}
+function xScale(){return document.querySelector('input[name="xScale"]:checked').value;}
+function yScale(){return document.querySelector('input[name="yScale"]:checked').value;}
+function canLogX(){return pts.length===0||pts.every(p=>p.x>0);}
+function canLogY(){return pts.length===0||pts.every(p=>p.y>0);}
+function updateScaleOptions(){
+  const xLogRadio=document.getElementById('xScaleLog'),yLogRadio=document.getElementById('yScaleLog');
+  const xLogLbl=document.getElementById('xScaleLogLbl'),yLogLbl=document.getElementById('yScaleLogLbl');
+  const okX=canLogX(),okY=canLogY();
+  xLogRadio.disabled=!okX;
+  yLogRadio.disabled=!okY;
+  xLogLbl.classList.toggle('disabled',!okX);
+  yLogLbl.classList.toggle('disabled',!okY);
+  if(!okX&&xScale()==='log10')document.getElementById('xScaleLin').checked=true;
+  if(!okY&&yScale()==='log10')document.getElementById('yScaleLin').checked=true;
+}
 function openHelp(key){
   const modal=document.getElementById('helpModal'),title=document.getElementById('helpTitle'),body=document.getElementById('helpBody'),content=HELP_CONTENT[key]||HELP_CONTENT.overview;
   title.textContent=content.title;
@@ -331,11 +368,24 @@ function formatTick(v,range){
 
 function fitToPoints(){
   if(pts.length===0){vpCX=0;vpCY=0;vpHW=6;vpHH=5;return;}
+  const logX=xScale()==='log10'&&canLogX();
+  const logY=yScale()==='log10'&&canLogY();
   let x0=Math.min(...pts.map(p=>p.x)),x1=Math.max(...pts.map(p=>p.x));
   let y0=Math.min(...pts.map(p=>p.y)),y1=Math.max(...pts.map(p=>p.y));
-  const xp=Math.max((x1-x0)*0.15,Math.abs(x1)*0.05,1);
-  const yp=Math.max((y1-y0)*0.15,Math.abs(y1)*0.05,1);
-  x0-=xp;x1+=xp;y0-=yp;y1+=yp;
+  if(logX){
+    x0=Math.max(x0,1e-300);x1=Math.max(x1,x0*10);
+    const lx0=Math.log10(x0),lx1=Math.log10(x1),lxp=Math.max((lx1-lx0)*0.15,0.3);
+    x0=Math.pow(10,lx0-lxp);x1=Math.pow(10,lx1+lxp);
+  }else{
+    const xp=Math.max((x1-x0)*0.15,Math.abs(x1)*0.05,1);x0-=xp;x1+=xp;
+  }
+  if(logY){
+    y0=Math.max(y0,1e-300);y1=Math.max(y1,y0*10);
+    const ly0=Math.log10(y0),ly1=Math.log10(y1),lyp=Math.max((ly1-ly0)*0.15,0.3);
+    y0=Math.pow(10,ly0-lyp);y1=Math.pow(10,ly1+lyp);
+  }else{
+    const yp=Math.max((y1-y0)*0.15,Math.abs(y1)*0.05,1);y0-=yp;y1+=yp;
+  }
   vpCX=(x0+x1)/2;vpCY=(y0+y1)/2;vpHW=(x1-x0)/2;vpHH=(y1-y0)/2;
   const{gW,gH}=gRect();
   // expand whichever axis needs more room so all points stay visible
@@ -522,50 +572,94 @@ function predict(){
   out.innerHTML=parts.length?parts.join('<span style="color:var(--border2);margin:0 .35rem">|</span>'):`<span class="pmuted">Enter X or Y to predict</span>`;
 }
 
+// ── Log tick generation ───────────────────────────────────────
+function logTicks(min,max){
+  const ticks=[];
+  const d0=Math.floor(Math.log10(min)),d1=Math.ceil(Math.log10(max));
+  for(let dec=d0;dec<=d1;dec++){
+    for(const sub of[1,2,5]){
+      const v=sub*Math.pow(10,dec);
+      if(v>=min*0.9999&&v<=max*1.0001)ticks.push(v);
+    }
+  }
+  return ticks;
+}
+function formatLogTick(v){
+  const log=Math.log10(v);
+  if(Math.abs(log-Math.round(log))<0.001){const e=Math.round(log);return e===0?'1':e===1?'10':`10^${e}`;}
+  return +v.toPrecision(2)+'';
+}
+
 // ── Drawing ───────────────────────────────────────────────────
 function draw(){
   const W=c.width,H=c.height,d=devicePixelRatio;
   ctx.fillStyle='#f7f6f2';ctx.fillRect(0,0,W,H);
   const{pl,pt,gW,gH}=gRect(),b=vpBounds();
-  function gx(x){return pl+(x-b.xMin)/(b.xMax-b.xMin)*gW;}
-  function gy(y){return pt+gH-(y-b.yMin)/(b.yMax-b.yMin)*gH;}
+  const logX=xScale()==='log10'&&b.xMin>0;
+  const logY=yScale()==='log10'&&b.yMin>0;
+
+  function gx(x){
+    if(logX){if(x<=0)return-9999;return pl+Math.log10(x/b.xMin)/Math.log10(b.xMax/b.xMin)*gW;}
+    return pl+(x-b.xMin)/(b.xMax-b.xMin)*gW;
+  }
+  function gy(y){
+    if(logY){if(y<=0)return 9999;return pt+gH-Math.log10(y/b.yMin)/Math.log10(b.yMax/b.yMin)*gH;}
+    return pt+gH-(y-b.yMin)/(b.yMax-b.yMin)*gH;
+  }
 
   // Smart grid
-  const xStep=niceStep(b.xMax-b.xMin),yStep=niceStep(b.yMax-b.yMin);
   ctx.strokeStyle='#e8e5de';ctx.lineWidth=1;
-  const xRange=b.xMax-b.xMin;
-  for(let xv=Math.ceil(b.xMin/xStep)*xStep;xv<=b.xMax+xStep*0.01;xv+=xStep){
-    const x=gx(xv);ctx.beginPath();ctx.moveTo(x,pt);ctx.lineTo(x,pt+gH);ctx.stroke();
-  }
-  for(let yv=Math.ceil(b.yMin/yStep)*yStep;yv<=b.yMax+yStep*0.01;yv+=yStep){
-    const y=gy(yv);ctx.beginPath();ctx.moveTo(pl,y);ctx.lineTo(pl+gW,y);ctx.stroke();
-  }
+  const xTicks=logX?logTicks(b.xMin,b.xMax):(()=>{const s=niceStep(b.xMax-b.xMin);const a=[];for(let v=Math.ceil(b.xMin/s)*s;v<=b.xMax+s*0.01;v+=s)a.push(v);return a;})();
+  const yTicks=logY?logTicks(b.yMin,b.yMax):(()=>{const s=niceStep(b.yMax-b.yMin);const a=[];for(let v=Math.ceil(b.yMin/s)*s;v<=b.yMax+s*0.01;v+=s)a.push(v);return a;})();
+  for(const xv of xTicks){const x=gx(xv);ctx.beginPath();ctx.moveTo(x,pt);ctx.lineTo(x,pt+gH);ctx.stroke();}
+  for(const yv of yTicks){const y=gy(yv);ctx.beginPath();ctx.moveTo(pl,y);ctx.lineTo(pl+gW,y);ctx.stroke();}
+
   // Axes
-  const ox=gx(0),oy=gy(0);ctx.strokeStyle='#c0bdb5';ctx.lineWidth=1.5;
-  if(ox>=pl&&ox<=pl+gW){ctx.beginPath();ctx.moveTo(ox,pt);ctx.lineTo(ox,pt+gH);ctx.stroke();}
-  if(oy>=pt&&oy<=pt+gH){ctx.beginPath();ctx.moveTo(pl,oy);ctx.lineTo(pl+gW,oy);ctx.stroke();}
+  ctx.strokeStyle='#c0bdb5';ctx.lineWidth=1.5;
+  if(!logX){const ox=gx(0);if(ox>=pl&&ox<=pl+gW){ctx.beginPath();ctx.moveTo(ox,pt);ctx.lineTo(ox,pt+gH);ctx.stroke();}}
+  if(!logY){const oy=gy(0);if(oy>=pt&&oy<=pt+gH){ctx.beginPath();ctx.moveTo(pl,oy);ctx.lineTo(pl+gW,oy);ctx.stroke();}}
+
   // Tick labels
   ctx.fillStyle='#4f4b45';ctx.font=`700 ${14*d}px "DM Sans",sans-serif`;
+  const xRange=b.xMax-b.xMin;
   ctx.textAlign='center';ctx.textBaseline='top';
-  for(let xv=Math.ceil(b.xMin/xStep)*xStep;xv<=b.xMax+xStep*0.01;xv+=xStep){
-    const px=gx(xv),py=Math.min(Math.max(gy(0),pt),pt+gH);ctx.fillText(formatTick(xv,xRange),px,py+10*d);
+  const xAxisPy=logY?pt+gH:Math.min(Math.max(gy(0),pt),pt+gH);
+  for(const xv of xTicks){
+    const px=gx(xv);
+    ctx.fillText(logX?formatLogTick(xv):formatTick(xv,xRange),px,xAxisPy+10*d);
   }
   ctx.textAlign='right';ctx.textBaseline='middle';
-  for(let yv=Math.ceil(b.yMin/yStep)*yStep;yv<=b.yMax+yStep*0.01;yv+=yStep){
-    const px=Math.min(Math.max(gx(0),pl),pl+gW),py=gy(yv);ctx.fillText(formatTick(yv,b.yMax-b.yMin),px-8*d,py);
+  const yAxisPx=logX?pl:Math.min(Math.max(gx(0),pl),pl+gW);
+  for(const yv of yTicks){
+    const py=gy(yv);
+    ctx.fillText(logY?formatLogTick(yv):formatTick(yv,b.yMax-b.yMin),yAxisPx-8*d,py);
   }
+
   // Axis labels
-  const xn=xLbl(),yn=yLbl();ctx.fillStyle='#1f1b16';ctx.font=`800 ${19*d}px "DM Sans",sans-serif`;
-  ctx.textAlign='center';ctx.textBaseline='alphabetic';ctx.fillText(xn,pl+gW/2,H-34*d);
-  ctx.save();ctx.translate(20*d,pt+gH/2);ctx.rotate(-Math.PI/2);ctx.textAlign='center';ctx.textBaseline='alphabetic';ctx.fillText(yn,0,0);ctx.restore();
+  const xn=xLbl(),yn=yLbl();
+  const xScaleSuffix=logX?' (log₁₀)':'',yScaleSuffix=logY?' (log₁₀)':'';
+  ctx.fillStyle='#1f1b16';ctx.font=`800 ${19*d}px "DM Sans",sans-serif`;
+  ctx.textAlign='center';ctx.textBaseline='alphabetic';ctx.fillText(xn+xScaleSuffix,pl+gW/2,H-34*d);
+  ctx.save();ctx.translate(20*d,pt+gH/2);ctx.rotate(-Math.PI/2);ctx.textAlign='center';ctx.textBaseline='alphabetic';ctx.fillText(yn+yScaleSuffix,0,0);ctx.restore();
+
   // Curve
   if(lastFit&&lastFit.fn){
     ctx.beginPath();ctx.strokeStyle='#1a6fcf';ctx.lineWidth=2.5*d;ctx.setLineDash([]);let started=false;
-    for(let i=0;i<=600;i++){const xv=b.xMin+(b.xMax-b.xMin)*i/600,yv=lastFit.fn(xv);if(!isFinite(yv)||yv<b.yMin-(b.yMax-b.yMin)*3||yv>b.yMax+(b.yMax-b.yMin)*3){started=false;continue;}const sx=gx(xv),sy=gy(yv);if(!started){ctx.moveTo(sx,sy);started=true;}else ctx.lineTo(sx,sy);}
+    const steps=600;
+    for(let i=0;i<=steps;i++){
+      let xv;
+      if(logX){xv=b.xMin*Math.pow(b.xMax/b.xMin,i/steps);}
+      else{xv=b.xMin+(b.xMax-b.xMin)*i/steps;}
+      const yv=lastFit.fn(xv);
+      if(!isFinite(yv)||yv<b.yMin-(b.yMax-b.yMin)*3||yv>b.yMax+(b.yMax-b.yMin)*3||(logY&&yv<=0)){started=false;continue;}
+      const sx=gx(xv),sy=gy(yv);
+      if(!started){ctx.moveTo(sx,sy);started=true;}else ctx.lineTo(sx,sy);
+    }
     ctx.stroke();
   }
   // Points
   pts.forEach((p,i)=>{
+    if((logX&&p.x<=0)||(logY&&p.y<=0))return;
     const sx=gx(p.x),sy=gy(p.y);
     ctx.beginPath();ctx.arc(sx,sy,5.5*d,0,Math.PI*2);
     ctx.fillStyle=i===selectedPt?'#ffffff':'#e03535';ctx.fill();
@@ -640,6 +734,8 @@ function saveState(){
     localStorage.setItem('dp2_fit',fit);
     localStorage.setItem('dp2_xLabel',xLbl());
     localStorage.setItem('dp2_yLabel',yLbl());
+    localStorage.setItem('dp2_xScale',xScale());
+    localStorage.setItem('dp2_yScale',yScale());
     const fl=document.getElementById('saveFlash');
     fl.classList.add('show');clearTimeout(saveTimer);
     saveTimer=setTimeout(()=>fl.classList.remove('show'),1000);
@@ -651,6 +747,8 @@ function loadState(){
   const f=localStorage.getItem('dp2_fit');if(f)setFit(f);
   const xl=localStorage.getItem('dp2_xLabel');if(xl)document.getElementById('xLabel').value=xl;
   const yl=localStorage.getItem('dp2_yLabel');if(yl)document.getElementById('yLabel').value=yl;
+  const xs=localStorage.getItem('dp2_xScale');if(xs){const r=document.querySelector(`input[name="xScale"][value="${xs}"]`);if(r)r.checked=true;}
+  const ys=localStorage.getItem('dp2_yScale');if(ys){const r=document.querySelector(`input[name="yScale"][value="${ys}"]`);if(r)r.checked=true;}
 }
 
 // ── Export ────────────────────────────────────────────────────
@@ -821,6 +919,7 @@ function updateR2Display(r2){
 
 function updateUI(){
   const xn=xLbl(),yn=yLbl();
+  updateScaleOptions();
   syncWindowLabels();
   document.getElementById('xFieldLbl').textContent=xn;
   document.getElementById('yFieldLbl').textContent=yn;
@@ -930,22 +1029,23 @@ function hideTooltip(){selectedPt=null;document.getElementById('ptTooltip').styl
 // ── Interaction ───────────────────────────────────────────────
 c.addEventListener('wheel',e=>{e.preventDefault();const r=c.getBoundingClientRect(),{wx,wy}=toWorld(e.clientX-r.left,e.clientY-r.top);zoomAround(e.deltaY>0?1.12:0.89,wx,wy);},{passive:false});
 
-let panDrag=null;
+let panDrag=null,panMoved=false;
 c.addEventListener('mousedown',e=>{
   if(e.button===1||(e.shiftKey&&e.button===0)){e.preventDefault();panDrag={sx:e.clientX,sy:e.clientY,cx:vpCX,cy:vpCY};c.style.cursor='grabbing';return;}
   if(e.button!==0)return;
   const r=c.getBoundingClientRect(),cssx=e.clientX-r.left,cssy=e.clientY-r.top;
   const hit=hitTestPt(cssx,cssy);
   if(hit>=0){
-    // start drag
     snapshot();
     dragPt=hit;c.style.cursor='grabbing';
     dragOffX=cssx;dragOffY=cssy;
     return;
   }
+  // plain left-click on empty canvas: pan when not in add-mode
+  if(!addMode){panDrag={sx:e.clientX,sy:e.clientY,cx:vpCX,cy:vpCY};c.style.cursor='grabbing';}
 });
 window.addEventListener('mousemove',e=>{
-  if(panDrag){const r=c.getBoundingClientRect(),dx=(e.clientX-panDrag.sx)/r.width*2*vpHW,dy=(e.clientY-panDrag.sy)/r.height*2*vpHH;vpCX=panDrag.cx-dx;vpCY=panDrag.cy+dy;autoFit=false;draw();drawResid();return;}
+  if(panDrag){const r=c.getBoundingClientRect(),dx=(e.clientX-panDrag.sx)/r.width*2*vpHW,dy=(e.clientY-panDrag.sy)/r.height*2*vpHH;vpCX=panDrag.cx-dx;vpCY=panDrag.cy+dy;autoFit=false;panMoved=true;draw();drawResid();return;}
   if(dragPt!==null){
     const r=c.getBoundingClientRect();
     const{wx,wy}=toWorld(e.clientX-r.left,e.clientY-r.top);
@@ -955,12 +1055,13 @@ window.addEventListener('mousemove',e=>{
   }
 });
 window.addEventListener('mouseup',e=>{
-  if(dragPt!==null){dragPt=null;c.style.cursor='crosshair';update();return;}
-  panDrag=null;c.style.cursor='crosshair';
+  if(dragPt!==null){dragPt=null;c.style.cursor=addMode?'crosshair':'grab';update();return;}
+  panDrag=null;c.style.cursor=addMode?'crosshair':'grab';
 });
 
 c.addEventListener('click',e=>{
-  if(e.shiftKey||e.button!==0||panDrag||dragPt!==null)return;
+  if(e.shiftKey||e.button!==0||dragPt!==null)return;
+  if(panMoved){panMoved=false;return;}
   const r=c.getBoundingClientRect(),cssx=e.clientX-r.left,cssy=e.clientY-r.top;
   const hit=hitTestPt(cssx,cssy);
   if(hit>=0){if(selectedPt===hit){hideTooltip();return;}showTooltip(hit,cssx,cssy);return;}
