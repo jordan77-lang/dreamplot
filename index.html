@@ -50,7 +50,7 @@ aside{background:var(--surface);border-right:1px solid var(--border);display:fle
 .eq-alt-label{font-family:'Space Mono',monospace;font-size:.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.18rem;}
 .eq-alt{font-family:'Space Mono',monospace;font-size:.75rem;color:var(--accent3);word-break:break-all;font-weight:700;}
 .ph{font-family:'Space Mono',monospace;font-size:.7rem;color:var(--muted);font-style:italic;}
-.stats-row{display:grid;grid-template-columns:1.15fr .85fr .7fr;gap:.5rem;margin-top:.45rem;}
+.stats-row{display:grid;grid-template-columns:1.15fr .85fr;gap:.5rem;margin-top:.45rem;}
 .stat{background:var(--bg);border:1px solid var(--border);border-radius:4px;padding:.35rem .45rem;text-align:center;min-width:0;}
 .stat-label{font-family:'Space Mono',monospace;font-size:.62rem;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;line-height:1.4;}
 .stat-value{font-family:'Space Mono',monospace;font-size:.9rem;font-weight:700;margin-top:.15rem;color:var(--text);}
@@ -184,8 +184,7 @@ aside::-webkit-scrollbar-thumb:hover{background:#8C1D40;}
       <div class="section-title-row"><h2>Fit Type</h2><button class="help-trigger" type="button" onclick="openHelp('fit-type')" aria-label="Open fit type help">?</button></div>
       <div class="fit-types">
         <button class="fit-btn active" data-fit="linear" onclick="setFit('linear')">Linear</button>
-        <button class="fit-btn" data-fit="quadratic" onclick="setFit('quadratic')">Quadratic</button>
-        <button class="fit-btn" data-fit="cubic" onclick="setFit('cubic')">Cubic</button>
+        <button class="fit-btn" data-fit="polynomial" onclick="setFit('polynomial')">Polynomial</button>
         <button class="fit-btn" data-fit="exponential" onclick="setFit('exponential')">Exponential</button>
         <button class="fit-btn" data-fit="logarithmic" onclick="setFit('logarithmic')">Logarithmic</button>
         <button class="fit-btn" data-fit="power" onclick="setFit('power')">Power</button>
@@ -200,10 +199,6 @@ aside::-webkit-scrollbar-thumb:hover{background:#8C1D40;}
         <div class="stat">
           <div class="stat-label" data-tooltip="Average percent error across fitted points; lower is better">Avg % Error</div>
           <div class="stat-value" id="mapeVal">—</div>
-        </div>
-        <div class="stat">
-          <div class="stat-label">R<sup style="font-size:.7em;vertical-align:super">2</sup></div>
-          <div class="stat-value" id="r2Val">—</div>
         </div>
         <div class="stat">
           <div class="stat-label">Points</div>
@@ -294,8 +289,8 @@ const HELP_CONTENT={
   data:{title:'Data Entry Help',html:`<p>Enter one point at a time by typing an x-value and a y-value, then clicking Add.</p><ul><li>Use decimal numbers when needed, such as <strong>2.5</strong> or <strong>-1.2</strong>.</li><li>Press Enter while focused in the data fields to add quickly.</li><li>Each pair is stored as one plotted point on the graph.</li></ul>`},
   'bulk-import':{title:'Bulk Import Help',html:`<p>Paste copied values from a spreadsheet, lab handout, or document into the bulk import box.</p><p>You can enter data in either of the following formats:</p><ul><li>One pair per line (e.g., <strong>1, 2.1</strong>)</li><li>A single column of alternating values (x1, y1, x2, y2, …), where each pair of rows is treated as one point</li></ul><p>Tabs, commas, and simple spaces are accepted.</p><p>After pasting, click <strong>Import Points</strong> to add all valid pairs at once.</p>`},
   'data-points':{title:'Data Points Help',html:`<p>This list shows every point currently in the graph.</p><ul><li>Use the delete button beside a point to remove it.</li><li>The numbering helps you confirm the order and catch input mistakes.</li><li>Changes here update the graph and fitted model immediately.</li></ul>`},
-  'fit-type':{title:'Fit Type Help',html:`<p>Choose the mathematical model that best matches your data trend.</p><ul><li><strong>Linear</strong> is best for straight-line trends.</li><li><strong>Quadratic</strong> and <strong>Cubic</strong> are useful for curved data.</li><li><strong>Exponential</strong>, <strong>Logarithmic</strong>, and <strong>Power</strong> are helpful for growth, decay, and scaling relationships.</li></ul>`},
-  results:{title:'Results Help',html:`<p>The results area shows the current best-fit equation for the selected model and summary statistics for how well it matches the data.</p><ul><li><strong>Average % Error</strong> estimates the typical percent difference between the model and the data.</li><li><strong>R²</strong> shows how much of the data trend is explained by the fit.</li><li>Use the copy icon to copy the displayed equation.</li></ul>`},
+  'fit-type':{title:'Fit Type Help',html:`<p>Choose the mathematical model that best matches your data trend.</p><ul><li><strong>Linear</strong> is best for straight-line trends.</li><li><strong>Polynomial</strong> is useful for curved data — fits a cubic (degree 3) curve when you have 4+ points, otherwise quadratic (degree 2).</li><li><strong>Exponential</strong>, <strong>Logarithmic</strong>, and <strong>Power</strong> are helpful for growth, decay, and scaling relationships.</li></ul>`},
+  results:{title:'Results Help',html:`<p>The results area shows the current best-fit equation for the selected model and summary statistics for how well it matches the data.</p><ul><li><strong>Average % Error</strong> estimates the typical percent difference between the model and the data.</li><li>Use the copy icon to copy the displayed equation.</li></ul>`},
   predict:{title:'Predict Help',html:`<p>Use Predict when you want the model to estimate one variable from the other.</p><ul><li>Enter an x-value to estimate y.</li><li>Enter a y-value to solve backward for x when the selected model allows a real solution.</li><li>Predictions come from the fitted model, not from connecting raw points one by one.</li></ul>`},
   'graph-settings':{title:'Graph Settings Help',html:`<p>Graph Settings control how each axis is labeled and scaled.</p><ul><li><strong>Axis Label</strong> — type the name of the variable for that axis. Labels appear on the graph and in the PDF report.</li><li><strong>Scale</strong> — choose <strong>Linear</strong> for evenly-spaced intervals, or <strong>Log₁₀</strong> to display a base-10 logarithmic axis.<ul><li>Log₁₀ is useful when your data spans several orders of magnitude, or when you want to visually linearize an exponential or power-law relationship.</li><li>Log₁₀ is greyed out if any value on that axis is zero or negative — logarithms are undefined for those values.</li></ul></li></ul>`},
   'axis-bounds':{title:'Axis Bounds Help',html:`<p>Axis bounds let you manually control the visible graph window.</p><ul><li>Leave a box blank to keep that edge on automatic fit.</li><li>Enter custom min and max values when you want to zoom into a specific region.</li><li>If all bound boxes are blank, the graph returns to automatic framing.</li></ul>`}
@@ -490,7 +485,7 @@ function fitOne(type,xs,ys,xn,yn){
   try{
     if(type==='linear'){const co=ls(xs.map(x=>[1,x]),ys);if(!co)return null;const fn=x=>co[0]+co[1]*x,data=xs.map((x,i)=>({x,y:ys[i]})),stats=fitStats(data,fn),inverse=(y)=>Math.abs(co[1])<1e-12?null:(y-co[0])/co[1];return{fn,inverse,eq:`${yn} = ${f(co[1])}${xn}${sg(co[0])}${f(Math.abs(co[0]))}`,alt:null,mape:stats.mape,r2:stats.r2,residuals:stats.residuals};}
     if(type==='quadratic'){const co=ls(xs.map(x=>[1,x,x*x]),ys);if(!co)return null;const fn=x=>co[0]+co[1]*x+co[2]*x*x,data=xs.map((x,i)=>({x,y:ys[i]})),stats=fitStats(data,fn),inverse=(y,xMin,xMax)=>{if(Math.abs(co[2])<1e-12)return Math.abs(co[1])<1e-12?null:(y-co[0])/co[1];const disc=co[1]*co[1]-4*co[2]*(co[0]-y);if(disc<0)return null;const root=Math.sqrt(disc),den=2*co[2];return chooseClosestRoot([(-co[1]-root)/den,(-co[1]+root)/den],xMin,xMax);};return{fn,inverse,eq:`${yn} = ${f(co[2])}${xn}²${sg(co[1])}${f(Math.abs(co[1]))}${xn}${sg(co[0])}${f(Math.abs(co[0]))}`,alt:null,mape:stats.mape,r2:stats.r2,residuals:stats.residuals};}
-    if(type==='cubic'){const co=ls(xs.map(x=>[1,x,x*x,x*x*x]),ys);if(!co)return null;const fn=x=>co[0]+co[1]*x+co[2]*x*x+co[3]*x*x*x,data=xs.map((x,i)=>({x,y:ys[i]})),stats=fitStats(data,fn);return{fn,eq:`${yn} = ${f(co[3])}${xn}³${sg(co[2])}${f(Math.abs(co[2]))}${xn}²${sg(co[1])}${f(Math.abs(co[1]))}${xn}${sg(co[0])}${f(Math.abs(co[0]))}`,alt:null,mape:stats.mape,r2:stats.r2,residuals:stats.residuals};}
+    if(type==='polynomial'){const cubic=xs.length>=4?ls(xs.map(x=>[1,x,x*x,x*x*x]),ys):null;if(cubic){const fn=x=>cubic[0]+cubic[1]*x+cubic[2]*x*x+cubic[3]*x*x*x,data=xs.map((x,i)=>({x,y:ys[i]})),stats=fitStats(data,fn);return{fn,eq:`${yn} = ${f(cubic[3])}${xn}³${sg(cubic[2])}${f(Math.abs(cubic[2]))}${xn}²${sg(cubic[1])}${f(Math.abs(cubic[1]))}${xn}${sg(cubic[0])}${f(Math.abs(cubic[0]))}`,alt:null,mape:stats.mape,r2:stats.r2,residuals:stats.residuals};}const co=ls(xs.map(x=>[1,x,x*x]),ys);if(!co)return null;const fn=x=>co[0]+co[1]*x+co[2]*x*x,data=xs.map((x,i)=>({x,y:ys[i]})),stats=fitStats(data,fn);return{fn,eq:`${yn} = ${f(co[2])}${xn}²${sg(co[1])}${f(Math.abs(co[1]))}${xn}${sg(co[0])}${f(Math.abs(co[0]))}`,alt:null,mape:stats.mape,r2:stats.r2,residuals:stats.residuals};}
     if(type==='exponential'){const v=xs.map((x,i)=>({x,y:ys[i]})).filter(p=>p.y>0);if(v.length<2)return null;
       // center x to avoid numerical overflow with large x values (e.g. years)
       const xm=v.reduce((s,p)=>s+p.x,0)/v.length;
@@ -773,7 +768,6 @@ function buildReportHTML(){
   const chartSrc=c.toDataURL('image/png');
   const eq=lastFit?lastFit.eq:'No fitted model';
   const avgErr=lastFit?`${lastFit.mape<0.1?'< 0.1':lastFit.mape.toFixed(1)}%`:'—';
-  const r2=lastFit&&isFinite(lastFit.r2)?lastFit.r2.toFixed(4):'—';
   const rows=pts.length?pts.map((p,i)=>`<tr><td>${i+1}</td><td>${escapeHtml(f(p.x,4))}</td><td>${escapeHtml(f(p.y,4))}</td></tr>`).join(''):'<tr><td colspan="3">No points available</td></tr>';
   const notes=pts.length<2?'Add at least two points to include a fitted model in the report.':(lastFit?'Summary reflects the currently selected model and visible graph state.':'The current model could not be fit to the available data.');
   return `<!DOCTYPE html>
@@ -849,7 +843,6 @@ function buildReportHTML(){
         <h2>Summary</h2>
         <div class="stats">
           <div class="stat"><div class="stat-label">Average % Error</div><div class="stat-value">${avgErr}</div></div>
-          <div class="stat"><div class="stat-label">R²</div><div class="stat-value">${r2}</div></div>
           <div class="stat"><div class="stat-label">X Label</div><div class="stat-value">${escapeHtml(xn)}</div></div>
           <div class="stat"><div class="stat-label">Y Label</div><div class="stat-value">${escapeHtml(yn)}</div></div>
         </div>
@@ -933,7 +926,6 @@ function updateUI(){
   }else{box.innerHTML=`<span class="ph">Add at least 2 points...</span>`;}
   document.getElementById('np').textContent=pts.length;
   updateErrorDisplay(lastFit?lastFit.mape:null);
-  updateR2Display(lastFit?lastFit.r2:null);
   document.getElementById('ptList').innerHTML=pts.length===0
     ?'<div class="empty">No points yet</div>'
     :pts.map((p,i)=>`<div class="pt"><span><span class="pi">${i+1}.</span>(${f(p.x,3)}, ${f(p.y,3)})</span><button class="del" onclick="delPt(${i})">✕</button></div>`).join('');
